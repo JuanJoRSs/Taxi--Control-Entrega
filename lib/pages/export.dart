@@ -161,7 +161,16 @@ class _ExportState extends State<Export> {
       onTap: onTap,
       child: Container(
         height: 55,
-        decoration: TaxiTheme.decoracionTarjeta,
+        // CORREGIDO: Sombras suaves para los botones de fecha
+        decoration: TaxiTheme.decoracionTarjeta.copyWith(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -184,6 +193,8 @@ class _ExportState extends State<Export> {
         backgroundColor: TaxiTheme.primaryDark,
         centerTitle: true,
         elevation: 0,
+        // ESTA LÍNEA ASEGURA QUE LA FLECHA DE VOLVER SEA BLANCA
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: _estaCargando
           ? const Center(child: CircularProgressIndicator(color: TaxiTheme.accentGold))
@@ -195,7 +206,16 @@ class _ExportState extends State<Export> {
                   _seccionTitulo("1. SELECCIONAR CONDUCTOR"),
                   const SizedBox(height: 12),
                   Container(
-                    decoration: TaxiTheme.decoracionTarjeta,
+                    // CORREGIDO: Sombra suave para el selector desplegable
+                    decoration: TaxiTheme.decoracionTarjeta.copyWith(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
@@ -237,6 +257,8 @@ class _ExportState extends State<Export> {
                         foregroundColor: TaxiTheme.primaryDark,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         elevation: 4,
+                        // Suavizamos la sombra del botón final
+                        shadowColor: Colors.black.withOpacity(0.3),
                       ),
                       onPressed: _estaCargando ? null : _procesarExportacion,
                       icon: const Icon(Icons.picture_as_pdf),

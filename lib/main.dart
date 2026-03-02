@@ -7,6 +7,7 @@ import 'pages/menu.dart';
 import 'pages/gestion_plantilla.dart';
 import 'pages/activo.dart'; 
 import 'pages/export.dart';
+import 'pages/historial.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
         '/gestion-plantilla': (context) => const GestionPlantilla(), 
         '/export': (context) => const Export(),
         '/trafico': (context) => const TraficoPage(),
+        '/historial': (context) => const HistorialPage(),
       },
     );
   }

@@ -212,6 +212,8 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
         centerTitle: true,
         backgroundColor: TaxiTheme.primaryDark,
         elevation: 0,
+        // ESTA LÍNEA ASEGURA QUE LA FLECHA DE VOLVER SEA BLANCA
+        iconTheme: const IconThemeData(color: Colors.white), 
         actions: [
           IconButton(
             onPressed: _obtenerConductores,
@@ -230,7 +232,16 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
                   itemBuilder: (context, index) {
                     final c = _conductores[index];
                     return Container(
-                      decoration: TaxiTheme.decoracionTarjeta, // Aplicamos las sombras del tema
+                      // APLICAMOS EL COPYWITH PARA SUAVIZAR LA SOMBRA DE LA TARJETA
+                      decoration: TaxiTheme.decoracionTarjeta.copyWith(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ), 
                       child: ListTile(
                         leading: CircleAvatar(
                           backgroundColor: TaxiTheme.primaryDark.withOpacity(0.1),

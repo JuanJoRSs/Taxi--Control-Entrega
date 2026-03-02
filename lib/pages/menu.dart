@@ -152,27 +152,33 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
                             
                             //El 'if' evalúa si eres admin. 
                             //Si no lo eres, este botón no se añade y el hueco se rellena automáticamente.
+                            // CORREGIDO: Cambiado de textSecondary a primaryDark para que no parezca deshabilitado
                             if (_esAdmin)
-                              _botonMenu(Icons.visibility, 'Activos', TaxiTheme.textSecondary, '/activos'),
+                              _botonMenu(Icons.visibility, 'Activos', TaxiTheme.primaryDark, '/activos'),
                             
                             _botonMenu(Icons.comment, 'Notas Coche', TaxiTheme.primaryDark, '/notas-vehiculo'),
                             _botonMenu(Icons.euro, 'Liquidación', TaxiTheme.accentGold, '/liquidacion'),
                             
                             //Solo Admin
+                            // CORREGIDO: Cambiado de textSecondary a primaryDark
                             if (_esAdmin)
-                              _botonMenu(Icons.groups, 'Plantilla', TaxiTheme.textSecondary, '/gestion-plantilla'),
+                              _botonMenu(Icons.groups, 'Plantilla', TaxiTheme.primaryDark, '/gestion-plantilla'),
                             
-                            _botonMenu(Icons.history, 'Historial', TaxiTheme.textSecondary, '/historial'),
+                            // CORREGIDO: Cambiado de textSecondary a primaryDark
+                            _botonMenu(Icons.history, 'Historial', TaxiTheme.primaryDark, '/historial'),
                             
                             //Solo Admin
+                            // CORREGIDO: Cambiado de textSecondary a primaryDark
                             if (_esAdmin)
-                              _botonMenu(Icons.picture_as_pdf, 'Export PDF', TaxiTheme.textSecondary, '/export'),
+                              _botonMenu(Icons.picture_as_pdf, 'Export PDF', TaxiTheme.primaryDark, '/export'),
                             
                             //Cambiamos el icono al surtidor y la ruta a '/estaciones' para que conecte con main.dart
                             _botonMenu(Icons.local_gas_station, 'Estaciones', TaxiTheme.primaryDark, '/estaciones'),
                             _botonMenu(Icons.warning_amber, 'Tráfico', TaxiTheme.warning, '/trafico'),
-                            _botonMenu(Icons.local_phone, 'Teléfonos', TaxiTheme.textSecondary, '/telefonos'),
-                            _botonMenu(Icons.settings, 'Ajustes', TaxiTheme.textSecondary, '/ajustes'),
+                            // CORREGIDO: Cambiado de textSecondary a primaryDark
+                            _botonMenu(Icons.local_phone, 'Teléfonos', TaxiTheme.primaryDark, '/telefonos'),
+                            // CORREGIDO: Cambiado de textSecondary a primaryDark
+                            _botonMenu(Icons.settings, 'Ajustes', TaxiTheme.primaryDark, '/ajustes'),
                           ],
                         ),
                       ],
