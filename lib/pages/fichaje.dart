@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../theme/app_theme.dart'; // <--- Importamos los tokens
+import '../theme/app_theme.dart'; // <--- Importamos los tokens premium
 
 class Fichaje extends StatefulWidget {
   const Fichaje({super.key});
@@ -23,6 +23,7 @@ class _FichajeState extends State<Fichaje> {
     _checkEstado();
   }
 
+  // Comprobar si el conductor tiene una sesión abierta en la base de datos
   Future<void> _checkEstado() async {
     final user = _supabase.auth.currentUser;
     if (user == null) {
@@ -60,6 +61,7 @@ class _FichajeState extends State<Fichaje> {
     }
   }
 
+  // Registrar entrada o salida
   Future<void> _gestionarFichaje() async {
     if (_idConductor == null) return;
 
@@ -94,7 +96,7 @@ class _FichajeState extends State<Fichaje> {
     if (!mounted) return;
     setState(() => _estaCargando = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(mensaje), backgroundColor: TaxiTheme.alerta),
+      SnackBar(content: Text(mensaje), backgroundColor: TaxiTheme.error),
     );
   }
 
@@ -103,17 +105,17 @@ class _FichajeState extends State<Fichaje> {
     final bool estaEnTurno = _idFichajeActivo != null;
 
     return Scaffold(
-      backgroundColor: TaxiTheme.fondoApp, // TOKEN: Fondo suave
+      backgroundColor: TaxiTheme.backgroundLight, // TOKEN: Gris perla suave
       appBar: AppBar(
         title: const Text('REGISTRO DE JORNADA', style: TaxiTheme.tituloAppBar),
         centerTitle: true,
-        backgroundColor: TaxiTheme.azulPrincipal, // TOKEN: Azul unificado
+        backgroundColor: TaxiTheme.primaryDark, // TOKEN: Azul Noche
         elevation: 0,
-        iconTheme: const IconThemeData(color: TaxiTheme.blancoPuro),
+        iconTheme: const IconThemeData(color: TaxiTheme.surfaceWhite),
       ),
       body: Center(
         child: _estaCargando
-            ? const CircularProgressIndicator(color: TaxiTheme.azulPrincipal)
+            ? const CircularProgressIndicator(color: TaxiTheme.accentGold) // Carga en Dorado
             : _ContenidoFichaje(
                 nombre: _nombreConductor ?? 'Conductor',
                 estaEnTurno: estaEnTurno,
@@ -140,73 +142,96 @@ class _ContenidoFichaje extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Indicador visual de estado
+        // Indicador visual de estado Premium
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(30),
           decoration: BoxDecoration(
             color: estaEnTurno
-                ? TaxiTheme.exito.withOpacity(0.1)
-                : TaxiTheme.grisBordes.withOpacity(0.2),
+                ? TaxiTheme.success.withOpacity(0.1)
+                : TaxiTheme.primaryDark.withOpacity(0.05),
             shape: BoxShape.circle,
+            boxShadow: [
+              if (estaEnTurno)
+                BoxShadow(
+                  color: TaxiTheme.success.withOpacity(0.2),
+                  blurRadius: 20,
+                  spreadRadius: 5,
+                )
+            ],
           ),
           child: Icon(
-            estaEnTurno ? Icons.play_circle_filled : Icons.pause_circle_filled,
+            estaEnTurno ? Icons.check_circle : Icons.radio_button_off,
             size: 100,
-            color: estaEnTurno
-                ? TaxiTheme.exito
-                : TaxiTheme.grisTextoSecundario,
+            color: estaEnTurno ? TaxiTheme.success : TaxiTheme.textSecondary,
           ),
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 40),
         Text(
           'Hola, $nombre',
           style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: TaxiTheme.grisTextoPrincipal,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          estaEnTurno ? 'ESTÁS EN TURNO' : 'TURNO FINALIZADO',
-          style: TextStyle(
-            fontSize: 14,
+            fontSize: 26,
             fontWeight: FontWeight.w800,
-            letterSpacing: 1.2,
-            color: estaEnTurno ? TaxiTheme.exito : TaxiTheme.alerta,
+            color: TaxiTheme.primaryDark,
+            letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 60),
+        const SizedBox(height: 10),
+        // Etiqueta de estado profesional
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            color: estaEnTurno ? TaxiTheme.success : TaxiTheme.textSecondary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            estaEnTurno ? 'SESIÓN ACTIVA' : 'FUERA DE SERVICIO',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+              color: estaEnTurno ? TaxiTheme.surfaceWhite : TaxiTheme.textSecondary,
+            ),
+          ),
+        ),
+        const SizedBox(height: 80),
+        // Botón de Acción Principal
         SizedBox(
-          width: 280,
+          width: 300,
           height: 65,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              // Si está en turno, el botón es rojo (para salir). Si no, verde (para entrar).
-              backgroundColor: estaEnTurno ? TaxiTheme.alerta : TaxiTheme.exito,
-              foregroundColor: TaxiTheme.blancoPuro,
+              // Si está en turno, el botón es el rojo de error. Si no, el azul principal.
+              backgroundColor: estaEnTurno ? TaxiTheme.error : TaxiTheme.primaryDark,
+              foregroundColor: TaxiTheme.surfaceWhite,
               elevation: 4,
+              shadowColor: (estaEnTurno ? TaxiTheme.error : TaxiTheme.primaryDark).withOpacity(0.4),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(TaxiTheme.radioBoton),
+                borderRadius: BorderRadius.circular(TaxiTheme.radioTarjeta),
               ),
             ),
             onPressed: onTap,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(estaEnTurno ? Icons.exit_to_app : Icons.login),
-                const SizedBox(width: 10),
+                Icon(estaEnTurno ? Icons.stop_rounded : Icons.play_arrow_rounded, size: 28),
+                const SizedBox(width: 12),
                 Text(
-                  estaEnTurno ? 'TERMINAR JORNADA' : 'INICIAR JORNADA',
+                  estaEnTurno ? 'FINALIZAR JORNADA' : 'INICIAR JORNADA',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    letterSpacing: 1.1,
                   ),
                 ),
               ],
             ),
           ),
         ),
+        const SizedBox(height: 20),
+        const Text(
+          'El registro quedará guardado con su ubicación actual',
+          style: TextStyle(color: TaxiTheme.textSecondary, fontSize: 11),
+        )
       ],
     );
   }

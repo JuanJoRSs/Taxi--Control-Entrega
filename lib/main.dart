@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/pages/trafico.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:myapp/pages/login_page.dart';
-import 'pages/fichaje.dart'; // Asegúrate que el archivo se llame así
+import 'pages/fichaje.dart'; 
 import 'pages/menu.dart';
 import 'pages/gestion_plantilla.dart';
 import 'pages/activo.dart'; 
@@ -26,21 +27,22 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'TaxiControl',
-      // Mantenemos '/' como login por consistencia
+      //Mantenemos '/' como login por consistencia
       initialRoute: '/',
 
       routes: {
-        // RUTA DE ACCESO
+        //RUTA DE ACCESO
         '/': (context) => const LoginPage(),
 
-        // MENÚ PRINCIPAL (GRID 3x4)
+        //MENÚ PRINCIPAL (GRID 3x4)
         '/menu': (context) => const MenuPrincipal(),
 
-        // PÁGINAS OPERATIVAS (Las que ya tienes creadas)
+        //PÁGINAS OPERATIVAS 
         '/fichaje': (context) => const Fichaje(),
         '/activos': (context) => const Activo(), 
         '/gestion-plantilla': (context) => const GestionPlantilla(), 
-        '/export': (context) => const Export()
+        '/export': (context) => const Export(),
+        '/trafico': (context) => const TraficoPage(),
       },
     );
   }
