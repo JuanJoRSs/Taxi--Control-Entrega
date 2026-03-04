@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../theme/app_theme.dart'; // <--- Tus tokens
+import '../theme/app_theme.dart'; // <--- Importamos tus tokens premium
 
 class Activo extends StatefulWidget {
   const Activo({super.key});
@@ -10,21 +10,26 @@ class Activo extends StatefulWidget {
 }
 
 class _ActivoState extends State<Activo> {
-  final _supabase = Supabase.instance.client;
-  List<dynamic> _activos = [];
-  bool _cargando = true;
+  // VARIABLES
+  final _supabase = Supabase.instance.client; // Conexión a la base de datos
+  List<dynamic> _activos = []; // Lista para guardar los conductores en turno
+  bool _cargando = true; // Control del círculo de carga
 
   @override
   void initState() {
     super.initState();
+    // Nada más entrar, buscamos quién está trabajando
     _obtenerActivos();
   }
 
+  // LÓGICA: Consultar Supabase
+  // Obtenemos los conductores que han iniciado turno pero aún no han salido
   Future<void> _obtenerActivos() async {
     try {
       setState(() => _cargando = true);
 
-      // Relación con tabla conductores para traer el nombre
+      // Relación con tabla conductores para traer el nombre del taxista
+      // Filtramos por aquellos que no tengan hora de salida registrada
       final data = await _supabase
           .from('fichajes')
           .select('*, conductores(nombre)')
@@ -39,119 +44,113 @@ class _ActivoState extends State<Activo> {
     } catch (e) {
       if (mounted) {
         setState(() => _cargando = false);
+        // Notificación de error con el nuevo color corporativo
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: TaxiTheme.alerta,
+            content: Text('Error de sincronización: $e'),
+            backgroundColor: TaxiTheme.error, 
           ),
         );
       }
     }
   }
 
+  // DISEÑO: Dibujar la pantalla
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: TaxiTheme.fondoApp, // TOKEN: Fondo off-white
+      backgroundColor: TaxiTheme.backgroundLight, // FONDO: Gris perla ejecutivo
       appBar: AppBar(
         title: const Text(
-          'CONDUCTORES EN TURNO',
+          'ESTADO DE FLOTA', // Título más profesional
           style: TaxiTheme.tituloAppBar,
         ),
         centerTitle: true,
-        backgroundColor: TaxiTheme.azulPrincipal, // TOKEN: Azul unificado
+        backgroundColor: TaxiTheme.primaryDark, // AZUL: Noche profundo
         elevation: 0,
-        iconTheme: const IconThemeData(color: TaxiTheme.blancoPuro),
+        iconTheme: const IconThemeData(color: TaxiTheme.surfaceWhite),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.sync), // Icono de sincronización
             onPressed: _obtenerActivos,
-            tooltip: 'Refrescar',
+            tooltip: 'Refrescar estado',
           ),
         ],
       ),
       body: _cargando
           ? const Center(
-              child: CircularProgressIndicator(color: TaxiTheme.azulPrincipal),
+              child: CircularProgressIndicator(color: TaxiTheme.accentGold), // CARGA: En dorado
             )
           : _activos.isEmpty
-          ? Center(
+          ? const Center(
               child: Text(
-                'No hay conductores activos.',
-                style: TaxiTheme.subtitulo,
+                'No hay conductores operativos ahora mismo.',
+                style: TextStyle(color: TaxiTheme.textSecondary),
               ),
             )
           : RefreshIndicator(
-              color: TaxiTheme.azulPrincipal,
+              color: TaxiTheme.primaryDark,
               onRefresh: _obtenerActivos,
               child: ListView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 itemCount: _activos.length,
                 itemBuilder: (context, index) {
                   final fichaje = _activos[index];
-                  final nombreConductor = fichaje['conductores'] != null
-                      ? fichaje['conductores']['nombre']
-                      : 'Desconocido';
+                  final nombre = fichaje['conductores']?['nombre'] ?? 'Sin Identificar';
 
-                  // Formateo rápido de hora
-                  String horaEntrada = fichaje['hora_entrada'] ?? '';
-                  if (horaEntrada.length > 16) {
-                    horaEntrada = horaEntrada.substring(11, 16);
-                  }
+                  // Formateo de hora profesional (HH:mm)
+                  String hora = fichaje['hora_entrada']?.toString().substring(11, 16) ?? '--:--';
 
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration:
-                        TaxiTheme.decoracionTarjeta, // TOKEN: Tarjeta unificada
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: TaxiTheme.decoracionTarjeta, // SOMBRA: Neumorfismo suave
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      leading: CircleAvatar(
-                        backgroundColor: TaxiTheme.exito.withOpacity(0.1),
+                      contentPadding: const EdgeInsets.all(15),
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: TaxiTheme.success.withOpacity(0.1), 
+                          shape: BoxShape.circle
+                        ),
                         child: const Icon(
-                          Icons.local_taxi,
-                          color: TaxiTheme.exito,
-                          size: 20,
+                          Icons.directions_car_filled, // Icono de taxi moderno
+                          color: TaxiTheme.success, 
                         ),
                       ),
                       title: Text(
-                        nombreConductor,
+                        nombre.toUpperCase(), 
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: TaxiTheme.grisTextoPrincipal,
-                        ),
+                          fontWeight: FontWeight.w800, 
+                          color: TaxiTheme.primaryDark,
+                          letterSpacing: 0.5
+                        )
                       ),
-                      subtitle: Row(
-                        children: [
-                          const Icon(
-                            Icons.access_time,
-                            size: 14,
-                            color: TaxiTheme.grisTextoSecundario,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Entrada: $horaEntrada',
-                            style: TaxiTheme.subtitulo,
-                          ),
-                        ],
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.access_time_filled, size: 14, color: TaxiTheme.textSecondary),
+                            const SizedBox(width: 6),
+                            Text(
+                              'En servicio desde las $hora', 
+                              style: const TextStyle(color: TaxiTheme.textSecondary)
+                            ),
+                          ],
+                        ),
                       ),
                       trailing: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: TaxiTheme.exito.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          color: TaxiTheme.success,
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Text(
                           'ACTIVO',
                           style: TextStyle(
-                            color: TaxiTheme.exito,
+                            color: TaxiTheme.surfaceWhite,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
                           ),
                         ),
                       ),

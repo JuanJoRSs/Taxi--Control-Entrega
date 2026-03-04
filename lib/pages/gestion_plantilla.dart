@@ -20,6 +20,7 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
     _obtenerConductores();
   }
 
+  // Obtenemos la lista de conductores desde la base de datos
   Future<void> _obtenerConductores() async {
     try {
       setState(() => _cargando = true);
@@ -40,19 +41,21 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
     }
   }
 
+  // Diálogo profesional para confirmar el borrado
   Future<void> _confirmarBorrado(Map<String, dynamic> conductor) async {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('¿ELIMINAR CONDUCTOR?'),
-        content: Text('Vas a eliminar a ${conductor['nombre']} ${conductor['apellido'] ?? ''}.\n\nSe borrarán sus datos y su cuenta de acceso de forma permanente.'),
+        backgroundColor: TaxiTheme.surfaceWhite, // Fondo limpio
+        title: const Text('¿ELIMINAR CONDUCTOR?', style: TextStyle(color: TaxiTheme.primaryDark, fontWeight: FontWeight.bold)),
+        content: Text('Vas a eliminar a ${conductor['nombre']} ${conductor['apellido'] ?? ''}.\n\nSe borrarán sus datos y su cuenta de acceso de forma permanente.', style: const TextStyle(color: TaxiTheme.textPrimary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('CANCELAR', style: TextStyle(color: TaxiTheme.grisTextoSecundario)),
+            child: const Text('CANCELAR', style: TextStyle(color: TaxiTheme.textSecondary)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: TaxiTheme.alerta),
+            style: ElevatedButton.styleFrom(backgroundColor: TaxiTheme.error), // Rojo corporativo
             onPressed: () => Navigator.pop(context, true),
             child: const Text('ELIMINAR', style: TextStyle(color: Colors.white)),
           ),
@@ -73,17 +76,17 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
 
         if (response.status == 200) {
           if (mounted) {
-            _notificar('Conductor y cuenta eliminados', TaxiTheme.exito);
+            _notificar('Conductor y cuenta eliminados', TaxiTheme.success);
             _obtenerConductores(); 
           }
         } else {
           final errorMsg = response.data['error'] ?? 'Error al eliminar usuario';
-          _notificar(errorMsg, TaxiTheme.alerta);
+          _notificar(errorMsg, TaxiTheme.error);
         }
       } catch (e) {
         debugPrint("Error al borrar: $e");
         if (mounted) {
-          _notificar('Error de conexión al eliminar', TaxiTheme.alerta);
+          _notificar('Error de conexión al eliminar', TaxiTheme.error);
         }
       } finally {
         if (mounted) setState(() => _cargando = false);
@@ -91,6 +94,7 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
     }
   }
 
+  // Formulario elegante para dar de alta
   void _mostrarFormularioAlta() {
     final nombreController = TextEditingController();
     final apellidoController = TextEditingController();
@@ -101,9 +105,9 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        backgroundColor: TaxiTheme.blancoPuro,
+        backgroundColor: TaxiTheme.surfaceWhite,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TaxiTheme.radioTarjeta)),
-        title: const Text('NUEVO CONDUCTOR', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text('NUEVO CONDUCTOR', style: TextStyle(color: TaxiTheme.primaryDark, fontWeight: FontWeight.bold, fontSize: 18)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -121,13 +125,13 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('CANCELAR', style: TextStyle(color: TaxiTheme.grisTextoSecundario)),
+            child: const Text('CANCELAR', style: TextStyle(color: TaxiTheme.textSecondary)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: TaxiTheme.azulPrincipal,
-              foregroundColor: TaxiTheme.blancoPuro,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TaxiTheme.radioBoton)),
+              backgroundColor: TaxiTheme.primaryDark,
+              foregroundColor: TaxiTheme.surfaceWhite,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TaxiTheme.radioTarjeta)),
             ),
             onPressed: () => _crearConductor(nombreController.text, apellidoController.text, emailController.text, passController.text),
             child: const Text('GUARDAR'),
@@ -137,6 +141,7 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
     );
   }
 
+  // Estilo de los inputs dentro del diálogo
   Widget _inputAlta(TextEditingController controller, String label, IconData icono, TextInputAction accion, {bool oscuro = false, TextInputType tipo = TextInputType.text}) {
     return TextField(
       controller: controller,
@@ -145,8 +150,11 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
       textInputAction: accion,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icono, color: TaxiTheme.azulPrincipal, size: 20),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(TaxiTheme.radioBoton)),
+        labelStyle: const TextStyle(color: TaxiTheme.textSecondary),
+        prefixIcon: Icon(icono, color: TaxiTheme.primaryDark, size: 20),
+        filled: true,
+        fillColor: TaxiTheme.backgroundLight,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(TaxiTheme.radioTarjeta), borderSide: BorderSide.none),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
     );
@@ -154,7 +162,7 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
 
   Future<void> _crearConductor(String nombre, String apellido, String email, String password) async {
   if (nombre.trim().isEmpty || email.trim().isEmpty || password.length < 6) {
-    _notificar('Datos incompletos o contraseña muy corta (mín. 6)', TaxiTheme.alerta);
+    _notificar('Datos incompletos o contraseña muy corta (mín. 6)', TaxiTheme.warning);
     return;
   }
 
@@ -175,17 +183,16 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
       if (mounted) {
         Navigator.of(context).pop(); 
         _obtenerConductores(); 
-        _notificar('Conductor creado correctamente', TaxiTheme.exito);
+        _notificar('Conductor creado correctamente', TaxiTheme.success);
       }
     } else {
-      // Si la función devuelve un error (ej. email ya existe)
       final errorMsg = response.data['error'] ?? 'Error desconocido';
-      _notificar('Error: $errorMsg', TaxiTheme.alerta);
+      _notificar('Error: $errorMsg', TaxiTheme.error);
     }
 
   } catch (e) {
     debugPrint("Error llamando a la función: $e");
-    _notificar('Error de conexión con el servidor', TaxiTheme.alerta);
+    _notificar('Error de conexión con el servidor', TaxiTheme.error);
   } finally {
     if (mounted) setState(() => _cargando = false);
   }
@@ -199,47 +206,61 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: TaxiTheme.fondoApp,
+      backgroundColor: TaxiTheme.backgroundLight, // Fondo ejecutivo
       appBar: AppBar(
         title: const Text('GESTIÓN DE PLANTILLA', style: TaxiTheme.tituloAppBar),
         centerTitle: true,
-        backgroundColor: TaxiTheme.azulPrincipal,
+        backgroundColor: TaxiTheme.primaryDark,
         elevation: 0,
+        // ESTA LÍNEA ASEGURA QUE LA FLECHA DE VOLVER SEA BLANCA
+        iconTheme: const IconThemeData(color: Colors.white), 
         actions: [
           IconButton(
             onPressed: _obtenerConductores,
-            icon: const Icon(Icons.refresh, color: TaxiTheme.blancoPuro),
+            icon: const Icon(Icons.refresh, color: TaxiTheme.surfaceWhite),
           ),
         ],
       ),
       body: _cargando
-          ? const Center(child: CircularProgressIndicator(color: TaxiTheme.azulPrincipal))
+          ? const Center(child: CircularProgressIndicator(color: TaxiTheme.accentGold))
           : _conductores.isEmpty
-              ? const Center(child: Text('No hay conductores registrados.', style: TaxiTheme.subtitulo))
+              ? const Center(child: Text('No hay conductores registrados.', style: TextStyle(color: TaxiTheme.textSecondary)))
               : ListView.separated(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   itemCount: _conductores.length,
-                  separatorBuilder: (context, index) => const Divider(height: 1, indent: 70),
+                  separatorBuilder: (context, index) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final c = _conductores[index];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: TaxiTheme.azulPrincipal.withOpacity(0.1),
-                        child: const Icon(Icons.person, color: TaxiTheme.azulPrincipal),
-                      ),
-                      title: Text('${c['nombre']} ${c['apellido'] ?? ''}', style: const TextStyle(fontWeight: FontWeight.bold, color: TaxiTheme.grisTextoPrincipal)),
-                      subtitle: Text(c['email'] ?? 'Sin email', style: TaxiTheme.subtitulo),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete_outline, color: TaxiTheme.alerta),
-                        onPressed: () => _confirmarBorrado(c),
+                    return Container(
+                      // APLICAMOS EL COPYWITH PARA SUAVIZAR LA SOMBRA DE LA TARJETA
+                      decoration: TaxiTheme.decoracionTarjeta.copyWith(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ), 
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: TaxiTheme.primaryDark.withOpacity(0.1),
+                          child: const Icon(Icons.person, color: TaxiTheme.primaryDark),
+                        ),
+                        title: Text('${c['nombre']} ${c['apellido'] ?? ''}', style: const TextStyle(fontWeight: FontWeight.bold, color: TaxiTheme.textPrimary)),
+                        subtitle: Text(c['email'] ?? 'Sin email', style: const TextStyle(color: TaxiTheme.textSecondary)),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline, color: TaxiTheme.error),
+                          onPressed: () => _confirmarBorrado(c),
+                        ),
                       ),
                     );
                   },
                 ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: TaxiTheme.azulPrincipal,
+        backgroundColor: TaxiTheme.primaryDark,
         onPressed: _mostrarFormularioAlta,
-        child: const Icon(Icons.add, color: TaxiTheme.blancoPuro),
+        child: const Icon(Icons.add, color: TaxiTheme.surfaceWhite),
       ),
     );
   }
