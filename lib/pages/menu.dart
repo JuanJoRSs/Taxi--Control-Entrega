@@ -156,7 +156,7 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
                             if (_esAdmin)
                               _botonMenu(Icons.visibility, 'Activos', TaxiTheme.primaryDark, '/activos'),
                             
-                            _botonMenu(Icons.comment, 'Notas Coche', TaxiTheme.primaryDark, '/notas-vehiculo'),
+                            _botonMenu(Icons.comment, 'Notas Coche', TaxiTheme.primaryDark, '/notas-coche'),
                             _botonMenu(Icons.euro, 'Liquidación', TaxiTheme.accentGold, '/liquidacion'),
                             
                             //Solo Admin

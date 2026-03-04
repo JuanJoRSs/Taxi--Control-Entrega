@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/pages/notas_coche.dart';
 import 'package:myapp/pages/trafico.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:myapp/pages/login_page.dart';
@@ -44,7 +45,8 @@ class MyApp extends StatelessWidget {
         '/gestion-plantilla': (context) => const GestionPlantilla(), 
         '/export': (context) => const Export(),
         '/trafico': (context) => const TraficoPage(),
-        '/historial': (context) => const HistorialPage(),
+        '/historial': (context) => const HistorialPage(), 
+        '/notas-coche': (context) => const NotasCoche()
       },
     );
   }
