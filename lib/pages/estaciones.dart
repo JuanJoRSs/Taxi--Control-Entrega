@@ -20,6 +20,7 @@ class EstacionesPage extends StatefulWidget {
 class _EstacionesPageState extends State<EstacionesPage> {
   //Variables
   //Controlador del mapa para poder mover la cámara.
+  // ignore: unused_field
   GoogleMapController? _mapController;
   
   //Lista de chinchetas (marcadores) que pondremos en el mapa.

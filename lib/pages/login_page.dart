@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
           );
         }
       }
-    } on AuthException catch (e) {
+    } on AuthException {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
