@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart';
+import 'cambio_password.dart'; 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,85 +12,118 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  //Controladores para capturar el texto que el usuario escriba
+  // Controladores para capturar el texto que el usuario escriba
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
   
-  //Instanciamos el cliente de Supabase para realizar las peticiones al servidor
+  // Variable para controlar si mostramos la animación de carga en el botón
+  bool _cargando = false;
+  
+  // Instanciamos el cliente de Supabase para realizar las peticiones al servidor
   final supabase = Supabase.instance.client;
 
-  //Función asíncrona para gestionar el inicio de sesión
+  // Función asíncrona para gestionar el inicio de sesión
   Future<void> login() async {
+    // Encendemos la animación de carga
+    setState(() {
+      _cargando = true;
+    });
+
     try {
-      //Intentamos iniciar sesión con email y contraseña usando la API de Supabase
+      // PASO 1: Intentamos iniciar sesión con email y contraseña
       final response = await supabase.auth.signInWithPassword(
-        email: _userController.text.trim(), //trim() elimina espacios accidentales al inicio/final
+        email: _userController.text.trim(), 
         password: _passController.text.trim(),
       );
 
-      //Verificamos si el widget sigue en pantalla antes de realizar acciones de contexto
+      final usuarioActual = response.user;
+
+      // Verificamos si el widget sigue en pantalla
       if (!mounted) return;
 
-      //Si Supabase nos devuelve un usuario válido, el login ha sido exitoso
-      if (response.user != null) {
-        //Navegamos al menú principal eliminando la pantalla de login del historial
-        Navigator.pushReplacementNamed(context, '/menu');
+      // Si Supabase nos devuelve un usuario válido, el login ha sido exitoso
+      if (usuarioActual != null) {
+        
+        // PASO 2: Consultamos a la tabla 'conductores' si necesita cambiar la clave
+        final datosConductor = await supabase
+            .from('conductores')
+            .select('debe_cambiar_pass')
+            .eq('auth_id', usuarioActual.id)
+            .single();
 
-        //Mostramos un mensaje de éxito en la parte inferior
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Acceso concedido'),
-            backgroundColor: TaxiTheme.success, 
-          ),
-        );
+        // Guardamos el valor (si es nulo por algún motivo, asumimos que no hace falta)
+        final debeCambiar = datosConductor['debe_cambiar_pass'] ?? false;
+
+        if (!mounted) return;
+
+        // PASO 3: Decidimos a qué pantalla enviarlo
+        if (debeCambiar == true) {
+          // Es su primera vez: Lo enviamos a cambiar la contraseña obligatoriamente
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const PantallaCambioPassword()),
+          );
+        } else {
+          // Ya tiene su clave personal: Lo enviamos al menú principal
+          Navigator.pushReplacementNamed(context, '/menu');
+
+          // Mostramos un mensaje de éxito
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Acceso concedido'),
+              backgroundColor: TaxiTheme.success, 
+            ),
+          );
+        }
       }
     } on AuthException catch (e) {
-      //Capturamos errores de autenticación 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: ${e.message}'),
+          content: Text('Error: Revise sus credenciales'), // Mensaje más amigable
           backgroundColor: TaxiTheme.error, 
         ),
       );
     } catch (e) {
-      //Capturamos cualquier otro error inesperado 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Error inesperado'),
+          content: Text('Error inesperado al conectar'),
           backgroundColor: TaxiTheme.error,
         ),
       );
+    } finally {
+      // Apagamos la animación de carga ocurra lo que ocurra
+      if (mounted) {
+        setState(() {
+          _cargando = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //Definimos el color de fondo de la aplicación usando el token del tema.
       backgroundColor: TaxiTheme.backgroundLight,
       appBar: AppBar(
         title: const Text('ACCESO AL SISTEMA', style: TaxiTheme.tituloAppBar),
-        centerTitle: true, // Centramos el título
+        centerTitle: true,
         backgroundColor: TaxiTheme.primaryDark,
-        elevation: 0, //Quitamos la sombra 
+        elevation: 0,
       ),
       body: Center(
-        // SingleChildScrollView evita errores de "pixel overflow".
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
-              mainAxisSize: MainAxisSize.min, //La columna solo ocupa el espacio necesario
+              mainAxisSize: MainAxisSize.min,
               children: [
-                //Contenedor decorativo para el logo circular
                 Container(
                   height: 140,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     boxShadow: [
-                      //Sombra para dar profundidad al logo
                       BoxShadow(
                         color: Colors.black.withOpacity(0.15),
                         blurRadius: 25,
@@ -97,10 +131,9 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
-                  //Logo
                   child: Image.asset('assets/images/logo.png'), 
                 ),
-                const SizedBox(height: 15), //Espaciador vertical
+                const SizedBox(height: 15),
                 const Text(
                   'TAXI CONTROL',
                   style: TextStyle(
@@ -113,15 +146,13 @@ class _LoginPageState extends State<LoginPage> {
                 
                 const SizedBox(height: 40),
 
-                // Caja blanca que contiene los campos de entrada
                 Container(
                   padding: const EdgeInsets.all(25),
-                  // Usamos copyWith para asegurar que la sombra no sea negra sólida sino suave (withOpacity)
                   decoration: TaxiTheme.decoracionTarjeta.copyWith(
-                    color: TaxiTheme.surfaceWhite, // Forzamos el blanco puro para que resalte
+                    color: TaxiTheme.surfaceWhite, 
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08), // Sombra suave como en el menú
+                        color: Colors.black.withOpacity(0.08), 
                         blurRadius: 15,
                         offset: const Offset(0, 8),
                       ),
@@ -129,7 +160,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: Column(
                     children: [
-                      //Campo de texto para el correo electrónico
                       TextField(
                         controller: _userController,
                         style: const TextStyle(color: TaxiTheme.textPrimary),
@@ -138,7 +168,6 @@ class _LoginPageState extends State<LoginPage> {
                           labelStyle: const TextStyle(color: TaxiTheme.textSecondary),
                           prefixIcon: const Icon(Icons.email_outlined, color: TaxiTheme.primaryDark),
                           filled: true,
-                          // Bajamos la opacidad del fondo del campo para que la tarjeta blanca mande
                           fillColor: TaxiTheme.backgroundLight.withOpacity(0.3), 
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -147,10 +176,9 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      //Campo de texto oculto para la contraseña
                       TextField(
                         controller: _passController,
-                        obscureText: true, //Oculta los caracteres
+                        obscureText: true,
                         style: const TextStyle(color: TaxiTheme.textPrimary),
                         decoration: InputDecoration(
                           labelText: 'Contraseña',
@@ -170,30 +198,32 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 40),
 
-                //Botón principal de acceso
                 SizedBox(
-                  width: double.infinity, //El botón ocupa todo el ancho posible
+                  width: double.infinity,
                   height: 60,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: TaxiTheme.primaryDark,
                       foregroundColor: TaxiTheme.surfaceWhite,
-                      elevation: 8, //Elevación para resaltar el botón sobre el fondo
-                      // Sombra con opacidad para evitar el negro puro "sucio"
+                      elevation: 8,
                       shadowColor: TaxiTheme.primaryDark.withOpacity(0.5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                    onPressed: login, //Al pulsar ejecuta la función de login definida arriba
-                    child: const Text(
-                      'ACCEDER A MI CUENTA',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.8,
-                      ),
-                    ),
+                    // Si _cargando es true, deshabilitamos el botón (pasando null)
+                    onPressed: _cargando ? null : login, 
+                    // Si _cargando es true, mostramos la rueda; si no, el texto normal
+                    child: _cargando 
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            'ACCEDER A MI CUENTA',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.8,
+                            ),
+                          ),
                   ),
                 ),
                 
