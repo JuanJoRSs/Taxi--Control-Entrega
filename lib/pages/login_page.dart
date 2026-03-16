@@ -133,6 +133,8 @@ class _LoginPageState extends State<LoginPage> {
                       TextField(
                         controller: _userController,
                         style: const TextStyle(color: TaxiTheme.textPrimary),
+                        //Le dice al teclado que el siguiente paso es pasar al otro campo
+                        textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           labelText: 'Email del Conductor',
                           labelStyle: const TextStyle(color: TaxiTheme.textSecondary),
@@ -152,6 +154,10 @@ class _LoginPageState extends State<LoginPage> {
                         controller: _passController,
                         obscureText: true, //Oculta los caracteres
                         style: const TextStyle(color: TaxiTheme.textPrimary),
+                        //Le dice al teclado que este es el último campo
+                        textInputAction: TextInputAction.done,
+                        //Detecta cuando se pulsa el botón de Enter y lanza la función de login
+                        onSubmitted: (value) => login(),
                         decoration: InputDecoration(
                           labelText: 'Contraseña',
                           labelStyle: const TextStyle(color: TaxiTheme.textSecondary),

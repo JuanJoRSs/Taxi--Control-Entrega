@@ -5,7 +5,7 @@ import 'package:intl/intl.dart'; //Para dar un formato bonito a las fechas y hor
 import '../theme/app_theme.dart'; //Colores y estilos corporativos.
 
 //Pantalla
-//Usamos StatefulWidget porque la pantalla cambiará: primero muestra carga, luego la lista de datos.
+//Usamos StatefulWidget porque la pantalla cambiará primero muestra carga, luego la lista de datos.
 class HistorialPage extends StatefulWidget {
   const HistorialPage({super.key});
 
@@ -27,28 +27,28 @@ class _HistorialPageState extends State<HistorialPage> {
   //Variable para guardar la opción seleccionada en el desplegable. Por defecto "Este Mes".
   String _filtroFrecuencia = 'Este Mes';
 
-  //--- NUEVAS VARIABLES PARA EL ADMIN ---
+  //Variables admin
   bool _esAdmin = false; //Saber si el usuario es administrador.
   List<dynamic> _listaConductores = []; //Lista para el desplegable de admin.
   String? _conductorSeleccionado; //El ID del conductor que el admin quiere ver.
 
   //Arranque
-  //initState es lo PRIMERO que se ejecuta al abrir esta pantalla.
+  //initState es lo primero que se ejecuta al abrir esta pantalla.
   @override
   void initState() {
     super.initState();
-    //Nada más abrir la pantalla, vamos a buscar el historial del conductor.
+    //Nada más abrir la pantalla buscamos el historial del conductor.
     _inicializarPantalla();
   }
 
   //Logica
-  //Función asíncrona para preparar todo (saber si es admin, cargar lista y luego historial).
+  //Función para saber si es admin, cargar lista y luego historial).
   Future<void> _inicializarPantalla() async {
     try {
       final user = _supabase.auth.currentUser;
       if (user == null) return;
 
-      //1. Buscamos si es admin y su ID.
+      //Buscamos si es admin y su ID.
       final datosConductor = await _supabase
           .from('conductores')
           .select('id_conductor, es_admin')
@@ -57,7 +57,7 @@ class _HistorialPageState extends State<HistorialPage> {
 
       _esAdmin = datosConductor['es_admin'] ?? false;
 
-      //2. Si es admin, descargamos la lista de todos los conductores para el filtro.
+      //Si es admin, descargamos la lista de todos los conductores para el filtro.
       if (_esAdmin) {
         final dataConductores = await _supabase
             .from('conductores')
@@ -67,7 +67,7 @@ class _HistorialPageState extends State<HistorialPage> {
         _listaConductores = dataConductores;
       }
 
-      //3. Una vez sabemos quién es, bajamos el historial.
+      //Una vez sabemos quién es, bajamos el historial.
       await _obtenerHistorial(idConductorActual: datosConductor['id_conductor']);
 
     } catch (e) {
@@ -76,7 +76,7 @@ class _HistorialPageState extends State<HistorialPage> {
     }
   }
 
-  //Función asíncrona para descargar los registros según el filtro.
+  //Función para descargar los registros según el filtro.
   Future<void> _obtenerHistorial({int? idConductorActual}) async {
     try {
       //Activamos el estado de carga por si estamos refrescando la pantalla.

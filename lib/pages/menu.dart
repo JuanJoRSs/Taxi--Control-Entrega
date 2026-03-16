@@ -152,23 +152,19 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
                             
                             //El 'if' evalúa si eres admin. 
                             //Si no lo eres, este botón no se añade y el hueco se rellena automáticamente.
-                            // CORREGIDO: Cambiado de textSecondary a primaryDark para que no parezca deshabilitado
                             if (_esAdmin)
                               _botonMenu(Icons.visibility, 'Activos', TaxiTheme.primaryDark, '/activos'),
                             
-                            _botonMenu(Icons.comment, 'Notas Coche', TaxiTheme.primaryDark, '/notas-coche'),
+                            _botonMenu(Icons.comment, 'Notas Coche', TaxiTheme.primaryDark, '/notas-vehiculo'),
                             _botonMenu(Icons.euro, 'Liquidación', TaxiTheme.accentGold, '/liquidacion'),
                             
                             //Solo Admin
-                            // CORREGIDO: Cambiado de textSecondary a primaryDark
                             if (_esAdmin)
                               _botonMenu(Icons.groups, 'Plantilla', TaxiTheme.primaryDark, '/gestion-plantilla'),
                             
-                            // CORREGIDO: Cambiado de textSecondary a primaryDark
                             _botonMenu(Icons.history, 'Historial', TaxiTheme.primaryDark, '/historial'),
                             
                             //Solo Admin
-                            // CORREGIDO: Cambiado de textSecondary a primaryDark
                             if (_esAdmin)
                               _botonMenu(Icons.picture_as_pdf, 'Export PDF', TaxiTheme.primaryDark, '/export'),
                             
@@ -197,7 +193,7 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
       decoration: TaxiTheme.decoracionTarjeta.copyWith(
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05), // Sombra sutil para que los botones no se vean oscuros
+            color: Colors.black.withOpacity(0.05), 
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

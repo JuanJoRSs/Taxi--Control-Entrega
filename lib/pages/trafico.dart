@@ -113,16 +113,14 @@ class _TraficoPageState extends State<TraficoPage> {
             myLocationButtonEnabled: false, 
           ),
 
-          // Posicionamos el botón arriba a la derecha para que no pise los mandos del mapa.
+          //Posicionamos el botón arriba a la derecha para que no pise los mandos del mapa.
           Positioned(
             top: 15,
             right: 15,
             child: FloatingActionButton(
-              // Restaurado: Opacidad en el color de sombra o resplandor del botón si fuera necesario
               backgroundColor: TaxiTheme.primaryDark,
-              // Añadimos una sombra suave para que destaque sobre el mapa
               elevation: 6,
-              onPressed: _obtenerUbicacionActual, //Al pulsar, ejecuta la lógica del GPS
+              onPressed: _obtenerUbicacionActual, //Al pulsar ejecuta la lógica del GPS
               child: const Icon(Icons.my_location, color: Colors.white), 
             ),
           ),
