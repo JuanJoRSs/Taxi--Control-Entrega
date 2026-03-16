@@ -8,7 +8,8 @@ import 'pages/menu.dart';
 import 'pages/gestion_plantilla.dart';
 import 'pages/activo.dart'; 
 import 'pages/export.dart';
-import 'pages/historial.dart';
+import 'pages/historial.dart'; 
+import 'pages/facturacion.dart';
 import 'pages/estaciones.dart';
 
 void main() async {
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         '/trafico': (context) => const TraficoPage(),
         '/historial': (context) => const HistorialPage(), 
         '/notas-coche': (context) => const NotasCoche(),
+        '/facturacion': (context) => const Facturacion(),
         '/estaciones': (context) => const EstacionesPage()
       },
     );

@@ -310,21 +310,21 @@ class _HistorialPageState extends State<HistorialPage> {
                           String horaSalida = '--:--';
                           
                           if (registro['hora_entrada'] != null) {
-                             final dateTimeEntrada = DateTime.parse(registro['hora_entrada']).toLocal();
-                             horaEntrada = DateFormat('HH:mm').format(dateTimeEntrada);
-                          }
-                          
-                          if (registro['hora_salida'] != null) {
-                             final dateTimeSalida = DateTime.parse(registro['hora_salida']).toLocal();
-                             final dateTimeEntrada = registro['hora_entrada'] != null ? DateTime.parse(registro['hora_entrada']).toLocal() : dateTimeSalida;
-                             
-                             //Si el día de salida es mayor al día de entrada, añadimos el texto "(Día sig.)" para que quede claro visualmente.
-                             if (dateTimeSalida.day != dateTimeEntrada.day || dateTimeSalida.month != dateTimeEntrada.month) {
-                                horaSalida = '${DateFormat('HH:mm').format(dateTimeSalida)} (Día sig.)';
-                             } else {
-                                horaSalida = DateFormat('HH:mm').format(dateTimeSalida);
-                             }
-                          }
+                            final dateTimeEntrada = DateTime.parse(registro['hora_entrada']).toLocal();
+                            horaEntrada = DateFormat('HH:mm').format(dateTimeEntrada);
+                        }
+                        
+                        if (registro['hora_salida'] != null) {
+                            final dateTimeSalida = DateTime.parse(registro['hora_salida']).toLocal();
+                            final dateTimeEntrada = registro['hora_entrada'] != null ? DateTime.parse(registro['hora_entrada']).toLocal() : dateTimeSalida;
+                            
+                            //Si el día de salida es mayor al día de entrada, añadimos el texto "(Día sig.)" para que quede claro visualmente.
+                            if (dateTimeSalida.day != dateTimeEntrada.day || dateTimeSalida.month != dateTimeEntrada.month) {
+                              horaSalida = '${DateFormat('HH:mm').format(dateTimeSalida)} (Día sig.)';
+                            } else {
+                              horaSalida = DateFormat('HH:mm').format(dateTimeSalida);
+                            }
+                        }
 
                           //Si somos admin, mostramos el nombre del conductor.
                           final nombreConductor = registro['conductores'] != null ? '${registro['conductores']['nombre']} ${registro['conductores']['apellido'] ?? ''}' : 'Desconocido';
