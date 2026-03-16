@@ -8,7 +8,8 @@ import 'pages/menu.dart';
 import 'pages/gestion_plantilla.dart';
 import 'pages/activo.dart'; 
 import 'pages/export.dart';
-import 'pages/historial.dart';
+import 'pages/historial.dart'; 
+import 'pages/facturacion.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +47,8 @@ class MyApp extends StatelessWidget {
         '/export': (context) => const Export(),
         '/trafico': (context) => const TraficoPage(),
         '/historial': (context) => const HistorialPage(), 
-        '/notas-coche': (context) => const NotasCoche()
+        '/notas-coche': (context) => const NotasCoche(),
+        '/facturacion': (context) => const Facturacion()
       },
     );
   }
