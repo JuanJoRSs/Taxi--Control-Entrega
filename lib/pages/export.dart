@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import '../theme/app_theme.dart'; // <--- Importamos tus nuevos tokens premium
+import '../theme/app_theme.dart';
 
 class Export extends StatefulWidget {
   const Export({super.key});
@@ -14,34 +14,31 @@ class Export extends StatefulWidget {
 }
 
 class _ExportState extends State<Export> {
-  // VARIABLES
-  final _supabase = Supabase.instance.client; // Conexión Supabase
-  bool _estaCargando = false; // Estado de carga
-  List<dynamic> _conductores = []; // Lista para el desplegable
-  String? _conductorSelect; // ID del conductor elegido
-  DateTime? _fechaInicio, _fechaFin; // Rango de fechas
+  final _supabase = Supabase.instance.client;
+  bool _estaCargando = false;
+  List<dynamic> _conductores = [];
+  String? _conductorSelect;
+  DateTime? _fechaInicio, _fechaFin;
 
   @override
   void initState() {
     super.initState();
-    _cargarConductores(); // Al iniciar, cargamos la lista de empleados
+    _cargarConductores();
   }
 
-  // LÓGICA: Cargar conductores para el filtro
   Future<void> _cargarConductores() async {
     try {
       final data = await _supabase
           .from('conductores')
           .select('id_conductor, nombre, apellido')
-          .eq('es_admin', false)
           .order('nombre');
+
       setState(() => _conductores = data);
     } catch (e) {
       debugPrint('Error cargando lista: $e');
     }
   }
 
-  // LÓGICA: Procesar y filtrar datos
   Future<void> _procesarExportacion() async {
     if (_fechaInicio == null || _fechaFin == null) {
       _mostrarMensaje('Por favor, selecciona el rango de fechas', isError: true);
@@ -63,6 +60,7 @@ class _ExportState extends State<Export> {
       final List<dynamic> data = await query
           .gte('fecha_fichaje', fIni)
           .lte('fecha_fichaje', fFin)
+          .order('id_conductor')
           .order('fecha_fichaje');
 
       if (data.isEmpty) {
@@ -72,12 +70,16 @@ class _ExportState extends State<Export> {
 
       String nombreC = "Todos";
       if (_conductorSelect != null) {
-        final c = _conductores.firstWhere((e) => e['id_conductor'].toString() == _conductorSelect);
+        final c = _conductores.firstWhere(
+          (e) => e['id_conductor'].toString() == _conductorSelect,
+        );
         nombreC = "${c['nombre']} ${c['apellido'] ?? ''}";
       }
 
+      bool esTodos = _conductorSelect == null;
+
       _mostrarMensaje('Generando reporte para $nombreC...');
-      await _generarPDF(data, nombreC);
+      await _generarPDF(data, nombreC, esTodos: esTodos);
 
     } catch (e) {
       _mostrarMensaje('Error inesperado: $e', isError: true);
@@ -86,48 +88,177 @@ class _ExportState extends State<Export> {
     }
   }
 
-  // LÓGICA: Generación del documento PDF profesional
-  Future<void> _generarPDF(List<dynamic> registros, String nombreC) async {
-  final pdf = pw.Document();
+  /// 🔥 PDF DINÁMICO
+  Future<void> _generarPDF(List<dynamic> registros, String nombreC, {bool esTodos = false}) async {
+    final pdf = pw.Document();
 
-  pdf.addPage(
-    pw.MultiPage(
-      pageFormat: PdfPageFormat.a4, 
-      margin: const pw.EdgeInsets.all(32),
-      build: (pw.Context context) => [
-        pw.Header(level: 0, child: pw.Text("REPORTE DE FICHAJES - TAXI CONTROL")),
-        pw.SizedBox(height: 10),
-        pw.Text("Conductor: $nombreC"),
-        pw.Text("Periodo: ${DateFormat('dd/MM/yyyy').format(_fechaInicio!)} al ${DateFormat('dd/MM/yyyy').format(_fechaFin!)}"),
-        pw.SizedBox(height: 20),
-        pw.TableHelper.fromTextArray(
-          headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColors.white),
-          headerDecoration: const pw.BoxDecoration(color: PdfColor.fromInt(0xFF1A2B4C)), // Azul noche en el PDF
-          headers: ['Fecha', 'Entrada', 'Salida'],
-          data: registros.map((r) {
-            DateTime fechaParsed = DateTime.parse(r['fecha_fichaje'].toString());
-            String fechaEspanola = DateFormat('dd/MM/yyyy').format(fechaParsed);
+    final headers = esTodos
+        ? ['Conductor', 'Fecha', 'Entrada', 'Salida']
+        : ['Fecha', 'Entrada', 'Salida'];
 
-            DateTime? entradaFull = r['hora_entrada'] != null ? DateTime.parse(r['hora_entrada']).toLocal() : null;
-            DateTime? salidaFull = r['hora_salida'] != null ? DateTime.parse(r['hora_salida']).toLocal() : null;
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(24),
+        build: (pw.Context context) => [
 
-            String txtEntrada = entradaFull != null ? DateFormat('HH:mm').format(entradaFull) : '-';
-            String txtSalida = salidaFull != null ? DateFormat('HH:mm').format(salidaFull) : '-';
-            
-            return [fechaEspanola, txtEntrada, txtSalida];
-          }).toList(),
-        ),
-      ],
-    ),
-  );
+          pw.Center(
+            child: pw.Text(
+              esTodos ? "REPORTE GENERAL DE FICHAJES" : "REPORTE DE FICHAJES",
+              style: pw.TextStyle(
+                fontSize: 18,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColor.fromInt(0xFF1A2B4C),
+              ),
+            ),
+          ),
 
-  await Printing.layoutPdf(onLayout: (format) async => pdf.save(), name: 'Reporte_TaxiControl.pdf');
-}
+          pw.SizedBox(height: 5),
 
-  // DISEÑO: Elementos visuales auxiliares
+          pw.Center(
+            child: pw.Text(
+              "Taxi Control",
+              style: pw.TextStyle(fontSize: 12, color: PdfColors.grey700),
+            ),
+          ),
+
+          pw.Divider(thickness: 1),
+          pw.SizedBox(height: 10),
+
+          if (!esTodos)
+            pw.Text("Conductor: $nombreC", style: const pw.TextStyle(fontSize: 10)),
+
+          pw.Text(
+            "Periodo: ${DateFormat('dd/MM/yyyy').format(_fechaInicio!)} - ${DateFormat('dd/MM/yyyy').format(_fechaFin!)}",
+            style: const pw.TextStyle(fontSize: 10),
+          ),
+
+          pw.SizedBox(height: 15),
+
+          pw.Table(
+            border: pw.TableBorder.all(color: PdfColors.grey400, width: 0.5),
+            columnWidths: esTodos
+                ? {
+                    0: const pw.FlexColumnWidth(2),
+                    1: const pw.FlexColumnWidth(2),
+                    2: const pw.FlexColumnWidth(1.5),
+                    3: const pw.FlexColumnWidth(1.5),
+                  }
+                : {
+                    0: const pw.FlexColumnWidth(2),
+                    1: const pw.FlexColumnWidth(1.5),
+                    2: const pw.FlexColumnWidth(1.5),
+                  },
+            children: [
+
+              /// HEADER
+              pw.TableRow(
+                decoration: const pw.BoxDecoration(
+                  color: PdfColor.fromInt(0xFF1A2B4C),
+                ),
+                children: headers.map((header) {
+                  return pw.Padding(
+                    padding: const pw.EdgeInsets.all(8),
+                    child: pw.Text(
+                      header,
+                      style: pw.TextStyle(
+                        color: PdfColors.white,
+                        fontSize: 10,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                      textAlign: pw.TextAlign.center,
+                    ),
+                  );
+                }).toList(),
+              ),
+
+              /// FILAS
+              ...registros.asMap().entries.map((entry) {
+                int index = entry.key;
+                var r = entry.value;
+
+                DateTime fechaParsed = DateTime.parse(r['fecha_fichaje'].toString());
+                String fechaEspanola = DateFormat('dd/MM/yyyy').format(fechaParsed);
+
+                DateTime? entradaFull = r['hora_entrada'] != null
+                    ? DateTime.parse(r['hora_entrada']).toLocal()
+                    : null;
+
+                DateTime? salidaFull = r['hora_salida'] != null
+                    ? DateTime.parse(r['hora_salida']).toLocal()
+                    : null;
+
+                String txtEntrada = entradaFull != null
+                    ? DateFormat('HH:mm').format(entradaFull)
+                    : '-';
+
+                String txtSalida = salidaFull != null
+                    ? DateFormat('HH:mm').format(salidaFull)
+                    : '-';
+
+                List<String> row = [];
+
+                if (esTodos) {
+                  final conductor = _conductores.firstWhere(
+                    (c) => c['id_conductor'] == r['id_conductor'],
+                    orElse: () => {'nombre': 'Desconocido', 'apellido': ''},
+                  );
+
+                  row.add("${conductor['nombre']} ${conductor['apellido'] ?? ''}");
+                }
+
+                row.addAll([
+                  fechaEspanola,
+                  txtEntrada,
+                  txtSalida,
+                ]);
+
+                return pw.TableRow(
+                  decoration: pw.BoxDecoration(
+                    color: index % 2 == 0 ? PdfColors.grey100 : PdfColors.white,
+                  ),
+                  children: row.map((cell) => _cell(cell)).toList(),
+                );
+              }),
+            ],
+          ),
+
+          pw.SizedBox(height: 20),
+
+          pw.Align(
+            alignment: pw.Alignment.centerRight,
+            child: pw.Text(
+              "Generado el ${DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now())}",
+              style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (format) async => pdf.save(),
+      name: 'Reporte_TaxiControl.pdf',
+    );
+  }
+
+  pw.Widget _cell(String text) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.all(8),
+      child: pw.Text(
+        text,
+        style: const pw.TextStyle(fontSize: 10),
+        textAlign: pw.TextAlign.center,
+      ),
+    );
+  }
+
   void _mostrarMensaje(String texto, {bool isError = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(texto), backgroundColor: isError ? TaxiTheme.error : TaxiTheme.success),
+      SnackBar(
+        content: Text(texto),
+        backgroundColor: isError ? TaxiTheme.error : TaxiTheme.success,
+      ),
     );
   }
 
@@ -140,28 +271,33 @@ class _ExportState extends State<Export> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(primary: TaxiTheme.primaryDark), // Calendario en azul noche
+            colorScheme: const ColorScheme.light(primary: TaxiTheme.primaryDark),
           ),
           child: child!,
         );
       },
     );
+
     if (picked != null) {
       setState(() => esInicio ? _fechaInicio = picked : _fechaFin = picked);
     }
   }
 
   Widget _seccionTitulo(String titulo) => Text(
-    titulo, 
-    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: TaxiTheme.primaryDark, letterSpacing: 1.1)
-  );
+        titulo,
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w800,
+          color: TaxiTheme.primaryDark,
+          letterSpacing: 1.1,
+        ),
+      );
 
   Widget _botonFechaPro({required String label, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
       child: Container(
         height: 55,
-        // CORREGIDO: Sombras suaves para los botones de fecha
         decoration: TaxiTheme.decoracionTarjeta.copyWith(
           boxShadow: [
             BoxShadow(
@@ -183,7 +319,6 @@ class _ExportState extends State<Export> {
     );
   }
 
-  // DISEÑO: Construcción de la interfaz
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,7 +328,6 @@ class _ExportState extends State<Export> {
         backgroundColor: TaxiTheme.primaryDark,
         centerTitle: true,
         elevation: 0,
-        // ESTA LÍNEA ASEGURA QUE LA FLECHA DE VOLVER SEA BLANCA
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: _estaCargando
@@ -206,7 +340,6 @@ class _ExportState extends State<Export> {
                   _seccionTitulo("1. SELECCIONAR CONDUCTOR"),
                   const SizedBox(height: 12),
                   Container(
-                    // CORREGIDO: Sombra suave para el selector desplegable
                     decoration: TaxiTheme.decoracionTarjeta.copyWith(
                       boxShadow: [
                         BoxShadow(
@@ -247,7 +380,6 @@ class _ExportState extends State<Export> {
                     ],
                   ),
                   const SizedBox(height: 60),
-                  // Botón de acción principal en color Oro/Ámbar
                   SizedBox(
                     width: double.infinity,
                     height: 58,
@@ -257,12 +389,14 @@ class _ExportState extends State<Export> {
                         foregroundColor: TaxiTheme.primaryDark,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         elevation: 4,
-                        // Suavizamos la sombra del botón final
                         shadowColor: Colors.black.withOpacity(0.3),
                       ),
                       onPressed: _estaCargando ? null : _procesarExportacion,
                       icon: const Icon(Icons.picture_as_pdf),
-                      label: const Text("DESCARGAR REPORTE PDF", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.8)),
+                      label: const Text(
+                        "DESCARGAR REPORTE PDF",
+                        style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.8),
+                      ),
                     ),
                   ),
                 ],
