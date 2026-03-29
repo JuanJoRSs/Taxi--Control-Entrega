@@ -111,6 +111,7 @@ class _LoginPageState extends State<LoginPage> {
         centerTitle: true,
         backgroundColor: TaxiTheme.primaryDark,
         elevation: 0,
+        automaticallyImplyLeading: false, //Este param sirve para eliminar la flecha de volver hacia atras en el historial
       ),
       body: Center(
         child: SingleChildScrollView(

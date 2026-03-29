@@ -11,6 +11,7 @@ import 'pages/export.dart';
 import 'pages/historial.dart'; 
 import 'pages/facturacion.dart';
 import 'pages/estaciones.dart';
+import 'pages/agenda.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,7 +51,8 @@ class MyApp extends StatelessWidget {
         '/historial': (context) => const HistorialPage(), 
         '/notas-coche': (context) => const NotasCoche(),
         '/facturacion': (context) => const Facturacion(),
-        '/estaciones': (context) => const EstacionesPage()
+        '/estaciones': (context) => const EstacionesPage(),
+        '/agenda': (context) => const AgendaContactos()
       },
     );
   }

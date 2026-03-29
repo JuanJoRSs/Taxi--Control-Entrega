@@ -6,10 +6,10 @@ class NotasCoche extends StatefulWidget {
   const NotasCoche({super.key});
 
   @override
-  State<NotasCoche> createState() => _NotasCocheState();
+  State<NotasCoche> createState() => _NotasCoche();
 }
 
-class _NotasCocheState extends State<NotasCoche> {
+class _NotasCoche extends State<NotasCoche> {
   final _supabase = Supabase.instance.client;
   bool _enviando = false;
   String _nombreAutor = "Admin";

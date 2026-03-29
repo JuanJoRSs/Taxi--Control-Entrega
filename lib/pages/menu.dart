@@ -155,7 +155,7 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
                             if (_esAdmin)
                               _botonMenu(Icons.visibility, 'Activos', TaxiTheme.primaryDark, '/activos'),
                             
-                            _botonMenu(Icons.comment, 'Notas Coche', TaxiTheme.primaryDark, '/notas-vehiculo'),
+                            _botonMenu(Icons.comment, 'Notas Coche', TaxiTheme.primaryDark, '/notas-coche'),
                             _botonMenu(Icons.euro, 'Liquidación', TaxiTheme.accentGold, '/facturacion'),
                             
                             //Solo Admin
@@ -172,7 +172,7 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
                             _botonMenu(Icons.local_gas_station, 'Estaciones', TaxiTheme.primaryDark, '/estaciones'),
                             _botonMenu(Icons.warning_amber, 'Tráfico', TaxiTheme.warning, '/trafico'),
                             // CORREGIDO: Cambiado de textSecondary a primaryDark
-                            _botonMenu(Icons.local_phone, 'Teléfonos', TaxiTheme.primaryDark, '/telefonos'),
+                            _botonMenu(Icons.local_phone, 'Teléfonos', TaxiTheme.primaryDark, '/agenda'),
                             // CORREGIDO: Cambiado de textSecondary a primaryDark
                             _botonMenu(Icons.settings, 'Ajustes', TaxiTheme.primaryDark, '/ajustes'),
                           ],
