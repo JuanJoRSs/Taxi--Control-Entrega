@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-// Asegúrate de que el import de tu TaxiTheme sea correcto según tu estructura de archivos
 import '../theme/app_theme.dart'; 
 
 class PantallaCambioPassword extends StatefulWidget {
@@ -11,20 +10,20 @@ class PantallaCambioPassword extends StatefulWidget {
 }
 
 class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
+  // Controlador para capturar lo que el usuario escribe
   final _controladorPassword = TextEditingController();
+  
+  // Estados para la interfaz
   bool _cargando = false;
   bool _obscureText = true;
 
+  /// Función principal para actualizar la seguridad del usuario
   Future<void> _actualizarContrasena() async {
-    final nuevaPassword = _controladorPassword.text;
+    final nuevaPassword = _controladorPassword.text.trim();
 
+    // Validamos que la contraseña sea segura (mínimo 6 caracteres por norma de Supabase)
     if (nuevaPassword.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('La contraseña debe tener al menos 6 caracteres'),
-          backgroundColor: TaxiTheme.error,
-        ),
-      );
+      _mostrarMensaje('La contraseña debe tener al menos 6 caracteres', esError: true);
       return;
     }
 
@@ -35,31 +34,44 @@ class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
       final usuarioActual = supabase.auth.currentUser;
 
       if (usuarioActual != null) {
+        // PASO 1: Actualizar la contraseña en el sistema de Autenticación
+        // Esto cambia la clave con la que el usuario hace login.
         await supabase.auth.updateUser(
           UserAttributes(password: nuevaPassword),
         );
 
+        // PASO 2: Actualizar nuestra tabla de base de datos 'conductores'
+        // Marcamos 'debe_cambiar_pass' como falso para que no le vuelva a pedir el cambio.
+        // Usamos 'auth_id' para encontrar al conductor exacto.
         await supabase
             .from('conductores')
             .update({'debe_cambiar_pass': false})
             .eq('auth_id', usuarioActual.id);
 
+        _mostrarMensaje('Seguridad actualizada con éxito');
+
+        // PASO 3: Navegación
+        // Si todo salió bien, lo mandamos al menú principal
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/menu');
         }
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al cambiar la contraseña: $e'),
-            backgroundColor: TaxiTheme.error,
-          ),
-        );
-      }
+      _mostrarMensaje('Error al sincronizar datos: $e', esError: true);
     } finally {
       if (mounted) setState(() { _cargando = false; });
     }
+  }
+
+  // Función auxiliar para mostrar notificaciones (SnackBars)
+  void _mostrarMensaje(String mensaje, {bool esError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensaje),
+        backgroundColor: esError ? TaxiTheme.error : Colors.green,
+      ),
+    );
   }
 
   @override
@@ -70,7 +82,7 @@ class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
         title: const Text('Seguridad de la Cuenta', style: TaxiTheme.tituloAppBar),
         backgroundColor: TaxiTheme.primaryDark,
         elevation: 0,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false, // Evita que vuelvan atrás sin cambiar la pass
         centerTitle: true,
       ),
       body: Center(
@@ -82,7 +94,6 @@ class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Icono decorativo en dorado
                 const Icon(
                   Icons.vpn_key_rounded,
                   size: 64,
@@ -109,7 +120,7 @@ class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
                 ),
                 const SizedBox(height: 32),
                 
-                // Campo de texto estilizado
+                // Campo de entrada de contraseña
                 TextField(
                   controller: _controladorPassword,
                   obscureText: _obscureText,
@@ -139,7 +150,7 @@ class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
                 ),
                 const SizedBox(height: 32),
                 
-                // Botón principal
+                // Botón de confirmación
                 SizedBox(
                   width: double.infinity,
                   height: 55,
