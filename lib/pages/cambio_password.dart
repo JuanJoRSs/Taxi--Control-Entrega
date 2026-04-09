@@ -10,18 +10,18 @@ class PantallaCambioPassword extends StatefulWidget {
 }
 
 class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
-  // Controlador para capturar lo que el usuario escribe
+  // Controlador para capturar lo que el usuario escribe en el campo de texto
   final _controladorPassword = TextEditingController();
   
-  // Estados para la interfaz
+  // Variables de estado para controlar la carga y la visibilidad del texto
   bool _cargando = false;
   bool _obscureText = true;
 
-  /// Función principal para actualizar la seguridad del usuario
+  /// Función principal para actualizar la contraseña del usuario en Supabase
   Future<void> _actualizarContrasena() async {
     final nuevaPassword = _controladorPassword.text.trim();
 
-    // Validamos que la contraseña sea segura (mínimo 6 caracteres por norma de Supabase)
+    // 1. Validación: La contraseña debe tener al menos 6 caracteres (requisito de Supabase)
     if (nuevaPassword.length < 6) {
       _mostrarMensaje('La contraseña debe tener al menos 6 caracteres', esError: true);
       return;
@@ -34,15 +34,13 @@ class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
       final usuarioActual = supabase.auth.currentUser;
 
       if (usuarioActual != null) {
-        // PASO 1: Actualizar la contraseña en el sistema de Autenticación
-        // Esto cambia la clave con la que el usuario hace login.
+        // PASO 1: Actualizar la contraseña en el sistema de Autenticación de Supabase
         await supabase.auth.updateUser(
           UserAttributes(password: nuevaPassword),
         );
 
-        // PASO 2: Actualizar nuestra tabla de base de datos 'conductores'
-        // Marcamos 'debe_cambiar_pass' como falso para que no le vuelva a pedir el cambio.
-        // Usamos 'auth_id' para encontrar al conductor exacto.
+        // PASO 2: Actualizar la tabla 'conductores' en la base de datos SQL
+        // Marcamos 'debe_cambiar_pass' como falso para que no le vuelva a pedir el cambio al entrar.
         await supabase
             .from('conductores')
             .update({'debe_cambiar_pass': false})
@@ -50,8 +48,7 @@ class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
 
         _mostrarMensaje('Seguridad actualizada con éxito');
 
-        // PASO 3: Navegación
-        // Si todo salió bien, lo mandamos al menú principal
+        // PASO 3: Navegación al menú principal
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/menu');
         }
@@ -59,11 +56,12 @@ class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
     } catch (e) {
       _mostrarMensaje('Error al sincronizar datos: $e', esError: true);
     } finally {
+      // Apagamos el indicador de carga
       if (mounted) setState(() { _cargando = false; });
     }
   }
 
-  // Función auxiliar para mostrar notificaciones (SnackBars)
+  // Función auxiliar para mostrar mensajes rápidos (SnackBars) al usuario
   void _mostrarMensaje(String mensaje, {bool esError = false}) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -82,7 +80,7 @@ class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
         title: const Text('Seguridad de la Cuenta', style: TaxiTheme.tituloAppBar),
         backgroundColor: TaxiTheme.primaryDark,
         elevation: 0,
-        automaticallyImplyLeading: false, // Evita que vuelvan atrás sin cambiar la pass
+        automaticallyImplyLeading: false, // Evita que el usuario regrese sin cambiar la contraseña
         centerTitle: true,
       ),
       body: Center(
@@ -94,6 +92,7 @@ class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Icono decorativo
                 const Icon(
                   Icons.vpn_key_rounded,
                   size: 64,
@@ -150,7 +149,7 @@ class _PantallaCambioPasswordState extends State<PantallaCambioPassword> {
                 ),
                 const SizedBox(height: 32),
                 
-                // Botón de confirmación
+                // Botón de confirmación con estado de carga
                 SizedBox(
                   width: double.infinity,
                   height: 55,

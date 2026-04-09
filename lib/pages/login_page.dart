@@ -22,15 +22,56 @@ class _LoginPageState extends State<LoginPage> {
   // Instanciamos el cliente de Supabase para realizar las peticiones al servidor
   final supabase = Supabase.instance.client;
 
-  // Función asíncrona para gestionar el inicio de sesión
-  Future<void> login() async {
-    // Encendemos la animación de carga
-    setState(() {
-      _cargando = true;
-    });
+  // --- NUEVA FUNCIÓN: Recuperación de contraseña ---
+  Future<void> _enviarCorreoRecuperacion() async {
+    final email = _userController.text.trim();
+
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, escribe tu email para enviarte el enlace'),
+          backgroundColor: TaxiTheme.error,
+        ),
+      );
+      return;
+    }
+
+    setState(() { _cargando = true; });
 
     try {
-      // PASO 1: Intentamos iniciar sesión con email y contraseña
+      // Supabase envía el correo automáticamente
+      await supabase.auth.resetPasswordForEmail(
+        email,
+        redirectTo: 'io.supabase.flutter://reset-callback/', 
+      );
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('¡Correo de recuperación enviado! Revisa tu bandeja.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo enviar el correo de recuperación'),
+            backgroundColor: TaxiTheme.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() { _cargando = false; });
+    }
+  }
+
+  // Función asíncrona para gestionar el inicio de sesión (Mantenemos tu lógica original)
+  Future<void> login() async {
+    setState(() { _cargando = true; });
+
+    try {
       final response = await supabase.auth.signInWithPassword(
         email: _userController.text.trim(), 
         password: _passController.text.trim(),
@@ -38,36 +79,27 @@ class _LoginPageState extends State<LoginPage> {
 
       final usuarioActual = response.user;
 
-      // Verificamos si el widget sigue en pantalla
       if (!mounted) return;
 
-      // Si Supabase nos devuelve un usuario válido, el login ha sido exitoso
       if (usuarioActual != null) {
-        
-        // PASO 2: Consultamos a la tabla 'conductores' si necesita cambiar la clave
+        // Consultamos si necesita cambiar la clave
         final datosConductor = await supabase
             .from('conductores')
             .select('debe_cambiar_pass')
             .eq('auth_id', usuarioActual.id)
             .single();
 
-        // Guardamos el valor (si es nulo por algún motivo, asumimos que no hace falta)
         final debeCambiar = datosConductor['debe_cambiar_pass'] ?? false;
 
         if (!mounted) return;
 
-        // PASO 3: Decidimos a qué pantalla enviarlo
         if (debeCambiar == true) {
-          // Es su primera vez: Lo enviamos a cambiar la contraseña obligatoriamente
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const PantallaCambioPassword()),
           );
         } else {
-          // Ya tiene su clave personal: Lo enviamos al menú principal
           Navigator.pushReplacementNamed(context, '/menu');
-
-          // Mostramos un mensaje de éxito
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Acceso concedido'),
@@ -79,8 +111,8 @@ class _LoginPageState extends State<LoginPage> {
     } on AuthException {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: Revise sus credenciales'), // Mensaje más amigable
+        const SnackBar(
+          content: Text('Error: Revise sus credenciales'),
           backgroundColor: TaxiTheme.error, 
         ),
       );
@@ -93,11 +125,8 @@ class _LoginPageState extends State<LoginPage> {
         ),
       );
     } finally {
-      // Apagamos la animación de carga ocurra lo que ocurra
       if (mounted) {
-        setState(() {
-          _cargando = false;
-        });
+        setState(() { _cargando = false; });
       }
     }
   }
@@ -111,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
         centerTitle: true,
         backgroundColor: TaxiTheme.primaryDark,
         elevation: 0,
-        automaticallyImplyLeading: false, //Este param sirve para eliminar la flecha de volver hacia atras en el historial
+        automaticallyImplyLeading: false, 
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -120,6 +149,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Logo
                 Container(
                   height: 140,
                   decoration: BoxDecoration(
@@ -147,6 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                 
                 const SizedBox(height: 40),
 
+                // Tarjeta de Login
                 Container(
                   padding: const EdgeInsets.all(25),
                   decoration: TaxiTheme.decoracionTarjeta.copyWith(
@@ -161,10 +192,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: Column(
                     children: [
+                      // Campo Email
                       TextField(
                         controller: _userController,
                         style: const TextStyle(color: TaxiTheme.textPrimary),
-                        //Le dice al teclado que el siguiente paso es pasar al otro campo
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           labelText: 'Email del Conductor',
@@ -179,13 +210,12 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
+                      // Campo Password
                       TextField(
                         controller: _passController,
                         obscureText: true,
                         style: const TextStyle(color: TaxiTheme.textPrimary),
-                        //Le dice al teclado que este es el último campo
                         textInputAction: TextInputAction.done,
-                        //Detecta cuando se pulsa el botón de Enter y lanza la función de login
                         onSubmitted: (value) => login(),
                         decoration: InputDecoration(
                           labelText: 'Contraseña',
@@ -199,12 +229,29 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
+                      
+                      // --- NUEVO: Botón Olvidé mi contraseña ---
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: _cargando ? null : _enviarCorreoRecuperacion,
+                          child: const Text(
+                            'Olvidé mi contraseña',
+                            style: TextStyle(
+                              color: TaxiTheme.accentGold,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
 
+                // Botón Acceder
                 SizedBox(
                   width: double.infinity,
                   height: 60,
@@ -218,9 +265,7 @@ class _LoginPageState extends State<LoginPage> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                     ),
-                    // Si _cargando es true, deshabilitamos el botón (pasando null)
                     onPressed: _cargando ? null : login, 
-                    // Si _cargando es true, mostramos la rueda; si no, el texto normal
                     child: _cargando 
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
