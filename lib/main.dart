@@ -14,6 +14,7 @@ import 'pages/facturacion.dart';
 import 'pages/estaciones.dart';
 import 'pages/agenda.dart';
 import 'pages/ajustes.dart';
+import 'pages/agencia.dart';
 
 // VARIABLE GLOBAL: Controla el tema desde cualquier parte de la app.
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
@@ -82,7 +83,8 @@ class MyApp extends StatelessWidget {
             '/facturacion': (context) => const Facturacion(),
             '/estaciones': (context) => const EstacionesPage(),
             '/agenda': (context) => const AgendaContactos(),
-            '/ajustes': (context) => const AjustesPage()
+            '/ajustes': (context) => const AjustesPage(),
+            '/agencias': (context) => const Agencias()
           },
         );
       },
