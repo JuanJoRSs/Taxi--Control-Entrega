@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../theme/app_theme.dart'; // <--- Importamos tus tokens premium
+import '../theme/app_theme.dart'; //Se importa el Token Theme para poder reciclcar los calores predefinidos y ganar uniformidad
 
 class Activo extends StatefulWidget {
   const Activo({super.key});
@@ -10,7 +10,7 @@ class Activo extends StatefulWidget {
 }
 
 class _ActivoState extends State<Activo> {
-  // VARIABLES
+
   final _supabase = Supabase.instance.client; // Conexión a la base de datos
   List<dynamic> _activos = []; // Lista para guardar los conductores en turno
   bool _cargando = true; // Control del círculo de carga
@@ -18,92 +18,85 @@ class _ActivoState extends State<Activo> {
   @override
   void initState() {
     super.initState();
-    // Nada más entrar, buscamos quién está trabajando
-    _obtenerActivos();
+    _obtenerActivos(); // Ejectuamos la función para obtener los conductores activos al iniciar la pantalla
   }
 
-  // LÓGICA: Consultar Supabase
-  // Obtenemos los conductores que han iniciado turno pero aún no han salido
-  Future<void> _obtenerActivos() async {
+  
+  Future<void> _obtenerActivos() async { //Función asíncrona para obtener los conductores activos
     try {
       setState(() => _cargando = true);
 
-      // Relación con tabla conductores para traer el nombre del taxista
-      // Filtramos por aquellos que no tengan hora de salida registrada
       final data = await _supabase
           .from('fichajes')
           .select('*, conductores(nombre)')
           .isFilter('hora_salida', null);
 
-      if (mounted) {
+      if (mounted) { //Mounted nos permite verififcar si el widget que estamos intentando actualizar sigue en el árbol de widgets
         setState(() {
-          _activos = data;
+          _activos = data; //Asignamos data a la variable de estado _activos para mostrarlo en el initState nada más se entre a la pantalla
           _cargando = false;
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() => _cargando = false);
-        // Notificación de error con el nuevo color corporativo
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error de sincronización: $e'),
-            backgroundColor: TaxiTheme.error, 
+            backgroundColor: TaxiTheme.error,  //Si hay error se muestra mensaje con el color del Token Theme junto con lo que devuelve el error
           ),
         );
       }
     }
   }
 
-  // DISEÑO: Dibujar la pantalla
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: TaxiTheme.backgroundLight, // FONDO: Gris perla ejecutivo
+      backgroundColor: TaxiTheme.backgroundLight, //Fondo Gris ejecutivo
       appBar: AppBar(
         title: const Text(
-          'ESTADO DE FLOTA', // Título más profesional
+          'Conductores Activos', //Título del AppBar
           style: TaxiTheme.tituloAppBar,
         ),
         centerTitle: true,
-        backgroundColor: TaxiTheme.primaryDark, // AZUL: Noche profundo
+        backgroundColor: TaxiTheme.primaryDark, //Azul oscuro para el fondo del AppBar
         elevation: 0,
         iconTheme: const IconThemeData(color: TaxiTheme.surfaceWhite),
         actions: [
           IconButton(
-            icon: const Icon(Icons.sync), // Icono de sincronización
+            icon: const Icon(Icons.sync), //Icono para refrescar, intuitivo para el user
             onPressed: _obtenerActivos,
-            tooltip: 'Refrescar estado',
+            tooltip: 'Refrescar', //Tooltip sirve para dar una especie de "hint" al usuario sobre que hace el botón
           ),
         ],
       ),
       body: _cargando
           ? const Center(
-              child: CircularProgressIndicator(color: TaxiTheme.accentGold), // CARGA: En dorado
+              child: CircularProgressIndicator(color: TaxiTheme.accentGold), //En caso de estar cargando decora así
             )
-          : _activos.isEmpty
+          : _activos.isEmpty 
           ? const Center(
-              child: Text(
-                'No hay conductores operativos ahora mismo.',
+              child: Text( //Si ya ha cargado y no hay nadie trabajando se muestra en gris el mensaje
+                'No hay conductores operativos ahora mismo.', 
                 style: TextStyle(color: TaxiTheme.textSecondary),
               ),
             )
           : RefreshIndicator(
               color: TaxiTheme.primaryDark,
               onRefresh: _obtenerActivos,
-              child: ListView.builder(
+              child: ListView.builder(//ListView construye una lista de forma que solo renderiza lo que se ve, sin nada de fondo. Eficiente para que no tarde cargadno
                 padding: const EdgeInsets.all(20),
                 itemCount: _activos.length,
-                itemBuilder: (context, index) {
+                itemBuilder: (context, index) {//Index para recorrer la lista de conductores activos (Sustituo de la iteración en Flutter)
                   final fichaje = _activos[index];
                   final nombre = fichaje['conductores']?['nombre'] ?? 'Sin Identificar';
 
-                  // Formateo de hora profesional (HH:mm)
-                  String hora = fichaje['hora_entrada']?.toString().substring(11, 16) ?? '--:--';
+                  String hora = fichaje['hora_entrada']?.toString().substring(11, 16) ?? '--:--'; //Declaracion de la variable que la hora de entrada
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 16),
-                    decoration: TaxiTheme.decoracionTarjeta, // SOMBRA: Neumorfismo suave
+                    decoration: TaxiTheme.decoracionTarjeta, //Se crean las tarjetas en el container con la decoración del Token Theme
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(15),
                       leading: Container(
@@ -113,11 +106,11 @@ class _ActivoState extends State<Activo> {
                           shape: BoxShape.circle
                         ),
                         child: const Icon(
-                          Icons.directions_car_filled, // Icono de taxi moderno
-                          color: TaxiTheme.success, 
+                          Icons.directions_car_filled, // Icono de taxi para rellenar la tarjeta
+                          color: TaxiTheme.success,
                         ),
                       ),
-                      title: Text(
+                      title: Text( //Titulo de la tarjeta, siendo este el propio nombre traido de Supabase
                         nombre.toUpperCase(), 
                         style: const TextStyle(
                           fontWeight: FontWeight.w800, 
@@ -132,7 +125,7 @@ class _ActivoState extends State<Activo> {
                             const Icon(Icons.access_time_filled, size: 14, color: TaxiTheme.textSecondary),
                             const SizedBox(width: 6),
                             Text(
-                              'En servicio desde las $hora', 
+                              'En servicio desde las $hora', //Para más información traemos la hora de entrada
                               style: const TextStyle(color: TaxiTheme.textSecondary)
                             ),
                           ],
@@ -144,7 +137,7 @@ class _ActivoState extends State<Activo> {
                           color: TaxiTheme.success,
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Text(
+                        child: const Text( //Detalle estetico para resaltar la tarjeta de activo
                           'ACTIVO',
                           style: TextStyle(
                             color: TaxiTheme.surfaceWhite,

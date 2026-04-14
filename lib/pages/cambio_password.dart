@@ -3,7 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../theme/app_theme.dart'; 
 
 class PantallaCambioPassword extends StatefulWidget {
-  const PantallaCambioPassword({Key? key}) : super(key: key);
+  const PantallaCambioPassword({super.key});
 
   @override
   State<PantallaCambioPassword> createState() => _PantallaCambioPasswordState();
