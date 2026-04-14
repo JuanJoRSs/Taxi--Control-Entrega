@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'theme/app_theme.dart'; // <--- IMPORTANTE PARA LEER TUS COLORES GLOBALES
+import 'theme/app_theme.dart'; 
 import 'pages/login_page.dart';
 import 'pages/fichaje.dart'; 
 import 'pages/menu.dart';
@@ -15,16 +15,21 @@ import 'pages/estaciones.dart';
 import 'pages/agenda.dart';
 import 'pages/ajustes.dart';
 import 'pages/agencia.dart';
+// IMPORTANTE: Añadimos la importación de la pantalla de cambio de contraseña
+import 'pages/cambio_password.dart'; 
 
-// VARIABLE GLOBAL: Controla el tema desde cualquier parte de la app.
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // CORRECCIÓN: Añadimos configuración para habilitar el flujo de autenticación por enlace
   await Supabase.initialize(
     url: 'https://bdczjlpwlzjjusjfxgxr.supabase.co',
     anonKey: 'sb_publishable_hLCkJFrTNxxHAx2g9S-VSQ_nKQi2TvT',
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce, // Recomendado para mayor seguridad en móviles
+    ),
   );
 
   runApp(const MyApp());
@@ -42,10 +47,9 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'TaxiControl',
           
-          // Le decimos a Flutter que escuche al interruptor
           themeMode: currentMode,
 
-          // 1. TEMA CLARO OFICIAL (Tus colores corporativos)
+          // TEMA CLARO
           theme: ThemeData.light().copyWith(
             scaffoldBackgroundColor: TaxiTheme.backgroundLight,
             appBarTheme: const AppBarTheme(
@@ -56,13 +60,13 @@ class MyApp extends StatelessWidget {
             ),
           ),
 
-          // 2. TEMA OSCURO OFICIAL (Colores de alto contraste)
+          // TEMA OSCURO
           darkTheme: ThemeData.dark().copyWith(
-            scaffoldBackgroundColor: const Color(0xFF121212), // Fondo gris muy oscuro
+            scaffoldBackgroundColor: const Color(0xFF121212),
             appBarTheme: const AppBarTheme(
-              backgroundColor: Color(0xFF1E1E1E), // Barra superior oscura
+              backgroundColor: Color(0xFF1E1E1E),
               elevation: 0,
-              iconTheme: IconThemeData(color: TaxiTheme.accentGold), // Iconos dorados para que destaquen
+              iconTheme: IconThemeData(color: TaxiTheme.accentGold),
               titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
@@ -72,6 +76,8 @@ class MyApp extends StatelessWidget {
           routes: {
             '/': (context) => const LoginPage(),
             '/login': (context) => const LoginPage(),
+            // NUEVA RUTA: Para que el sistema sepa a dónde ir al recuperar contraseña
+            '/cambio-password': (context) => const PantallaCambioPassword(),
             '/menu': (context) => const MenuPrincipal(),
             '/fichaje': (context) => const Fichaje(),
             '/activos': (context) => const Activo(), 
