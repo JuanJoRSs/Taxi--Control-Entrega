@@ -143,6 +143,7 @@ class _FacturacionScreenState extends State<Facturacion> {
         'fecha': DateTime.now().toIso8601String().split('T')[0],
       });
       _montoController.clear();
+      // ignore: use_build_context_synchronously
       FocusScope.of(context).unfocus();
       setState(() => _mostrandoFormulario = false);
       await _obtenerDatos();

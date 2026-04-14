@@ -19,55 +19,61 @@ class _LoginPageState extends State<LoginPage> {
   // Variable para controlar si mostramos la animación de carga en el botón
   bool _cargando = false;
   
-  // Instanciamos el cliente de Supabase para realizar las peticiones al servidor
+  // Instanciamos el cliente de Supabase
   final supabase = Supabase.instance.client;
 
-  // --- NUEVA FUNCIÓN: Recuperación de contraseña ---
+  @override
+  void initState() {
+    super.initState();
+    // ESCUCHADOR DE ENLACES: Detecta si el usuario vuelve a la app desde el correo
+    _escucharRetornoDeEmail();
+  }
+
+  /// Detecta si el usuario ha pulsado el enlace de recuperación en su correo
+  void _escucharRetornoDeEmail() {
+    supabase.auth.onAuthStateChange.listen((data) {
+      final AuthChangeEvent event = data.event;
+      // Si el evento es 'passwordRecovery', navegamos directamente a la pantalla de cambio
+      if (event == AuthChangeEvent.passwordRecovery) {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const PantallaCambioPassword()),
+          );
+        }
+      }
+    });
+  }
+
+  /// FUNCIÓN: Recuperación de contraseña con servidor SMTP profesional
   Future<void> _enviarCorreoRecuperacion() async {
     final email = _userController.text.trim();
 
     if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor, escribe tu email para enviarte el enlace'),
-          backgroundColor: TaxiTheme.error,
-        ),
-      );
+      _mostrarMensaje('Por favor, escribe tu email para enviarte el enlace', esError: true);
       return;
     }
 
     setState(() { _cargando = true; });
 
     try {
-      // Supabase envía el correo automáticamente
+      // Enviamos el correo. Supabase usará automáticamente tu SMTP de Resend configurado.
       await supabase.auth.resetPasswordForEmail(
         email,
+        // IMPORTANTE: Este redirectTo debe coincidir con tu AndroidManifest y Supabase Dashboard
         redirectTo: 'io.supabase.flutter://reset-callback/', 
       );
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('¡Correo de recuperación enviado! Revisa tu bandeja.'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
+      _mostrarMensaje('¡Correo enviado! Revisa tu bandeja de entrada (y spam).');
+
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No se pudo enviar el correo de recuperación'),
-            backgroundColor: TaxiTheme.error,
-          ),
-        );
-      }
+      _mostrarMensaje('No se pudo enviar el correo de recuperación', esError: true);
     } finally {
       if (mounted) setState(() { _cargando = false; });
     }
   }
 
-  // Función asíncrona para gestionar el inicio de sesión (Mantenemos tu lógica original)
+  /// Función asíncrona para gestionar el inicio de sesión normal
   Future<void> login() async {
     setState(() { _cargando = true; });
 
@@ -82,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
 
       if (usuarioActual != null) {
-        // Consultamos si necesita cambiar la clave
+        // Verificamos si es su primera vez en la tabla 'conductores'
         final datosConductor = await supabase
             .from('conductores')
             .select('debe_cambiar_pass')
@@ -100,35 +106,27 @@ class _LoginPageState extends State<LoginPage> {
           );
         } else {
           Navigator.pushReplacementNamed(context, '/menu');
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Acceso concedido'),
-              backgroundColor: TaxiTheme.success, 
-            ),
-          );
+          _mostrarMensaje('Acceso concedido');
         }
       }
     } on AuthException {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error: Revise sus credenciales'),
-          backgroundColor: TaxiTheme.error, 
-        ),
-      );
+      _mostrarMensaje('Error: Revise sus credenciales', esError: true);
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error inesperado al conectar'),
-          backgroundColor: TaxiTheme.error,
-        ),
-      );
+      _mostrarMensaje('Error inesperado al conectar', esError: true);
     } finally {
-      if (mounted) {
-        setState(() { _cargando = false; });
-      }
+      if (mounted) setState(() { _cargando = false; });
     }
+  }
+
+  // Helper para SnackBars
+  void _mostrarMensaje(String mensaje, {bool esError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensaje),
+        backgroundColor: esError ? TaxiTheme.error : Colors.green,
+      ),
+    );
   }
 
   @override
@@ -192,7 +190,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: Column(
                     children: [
-                      // Campo Email
                       TextField(
                         controller: _userController,
                         style: const TextStyle(color: TaxiTheme.textPrimary),
@@ -210,7 +207,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      // Campo Password
                       TextField(
                         controller: _passController,
                         obscureText: true,
@@ -230,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       
-                      // --- NUEVO: Botón Olvidé mi contraseña ---
+                      // Botón Olvidé mi contraseña
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
