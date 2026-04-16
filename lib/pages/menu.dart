@@ -73,7 +73,8 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
   Widget build(BuildContext context) {
     //Scaffold es el esqueleto de la pantalla tiene barra superior, cuerpo, fondo.
     return Scaffold(
-      backgroundColor: TaxiTheme.backgroundLight, //Color de fondo gris clarito.
+      // ✅ 1. FONDO PANTALLA DINÁMICO
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, 
       
       //TopBar
       appBar: AppBar(
@@ -124,13 +125,14 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
                           child: Image.asset('assets/images/logo.png'), //Logo
                         ),
                         const SizedBox(height: 10),
-                        const Text(
+                        Text(
                           'TAXI CONTROL',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 2,
-                            color: TaxiTheme.primaryDark,
+                            // ✅ 3. TEXTO DINÁMICO: El logo cambia según el tema
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
                           ),
                         ),
                         const SizedBox(height: 35),
@@ -191,6 +193,8 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
   Widget _botonMenu(IconData icono, String texto, Color color, String ruta) {
     return Container(
       decoration: TaxiTheme.decoracionTarjeta.copyWith(
+        // ✅ 2. FONDO TARJETA DINÁMICO
+        color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05), 
@@ -212,7 +216,10 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
               Text(
                 texto,
                 textAlign: TextAlign.center,
-                style: TaxiTheme.textoBotonGrid, //Dibuja el texto.
+                // ✅ 3. TEXTO DINÁMICO: Combina tu estilo base con el color dinámico
+                style: TaxiTheme.textoBotonGrid.copyWith(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
               ),
             ],
           ),

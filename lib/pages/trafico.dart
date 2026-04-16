@@ -80,6 +80,8 @@ class _TraficoPageState extends State<TraficoPage> {
   Widget build(BuildContext context) {
     //Scaffold es el "esqueleto" visual.
     return Scaffold(
+      // ✅ 1. FONDO DINÁMICO
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       
       //La barra azul de arriba con el título. (Actualizado a paleta Premium)
       appBar: AppBar(

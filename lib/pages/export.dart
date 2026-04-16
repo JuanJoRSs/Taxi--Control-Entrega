@@ -151,9 +151,15 @@ class _ExportState extends State<Export> {
     }
   }
 
+  // ✅ 3. TEXTO DINÁMICO: El título de sección se adapta al modo oscuro
   Widget _seccionTitulo(String titulo) => Text(
     titulo, 
-    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: TaxiTheme.primaryDark, letterSpacing: 1.1)
+    style: TextStyle(
+      fontSize: 13, 
+      fontWeight: FontWeight.w800, 
+      color: Theme.of(context).textTheme.bodyLarge?.color, 
+      letterSpacing: 1.1
+    )
   );
 
   Widget _botonFechaPro({required String label, required VoidCallback onTap}) {
@@ -161,8 +167,9 @@ class _ExportState extends State<Export> {
       onTap: onTap,
       child: Container(
         height: 55,
-        // CORREGIDO: Sombras suaves para los botones de fecha
+        // ✅ 2. TARJETA DINÁMICA: Fondo de los botones de fecha dinámico
         decoration: TaxiTheme.decoracionTarjeta.copyWith(
+          color: Theme.of(context).cardColor,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.05),
@@ -174,9 +181,10 @@ class _ExportState extends State<Export> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.calendar_today_outlined, size: 16, color: TaxiTheme.primaryDark),
+            // ✅ 3. TEXTO/ICONO DINÁMICO
+            Icon(Icons.calendar_today_outlined, size: 16, color: Theme.of(context).textTheme.bodyLarge?.color),
             const SizedBox(width: 10),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text(label, style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).textTheme.bodyLarge?.color)),
           ],
         ),
       ),
@@ -187,7 +195,8 @@ class _ExportState extends State<Export> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: TaxiTheme.backgroundLight,
+      // ✅ 1. FONDO DINÁMICO
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text("EXPORTAR INFORMES", style: TaxiTheme.tituloAppBar),
         backgroundColor: TaxiTheme.primaryDark,
@@ -206,8 +215,9 @@ class _ExportState extends State<Export> {
                   _seccionTitulo("1. SELECCIONAR CONDUCTOR"),
                   const SizedBox(height: 12),
                   Container(
-                    // CORREGIDO: Sombra suave para el selector desplegable
+                    // ✅ 2. TARJETA DINÁMICA: Fondo del desplegable dinámico
                     decoration: TaxiTheme.decoracionTarjeta.copyWith(
+                      color: Theme.of(context).cardColor,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.05),

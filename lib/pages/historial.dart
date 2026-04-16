@@ -165,7 +165,8 @@ class _HistorialPageState extends State<HistorialPage> {
   Widget build(BuildContext context) {
     //Scaffold es el esqueleto de la pantalla.
     return Scaffold(
-      backgroundColor: TaxiTheme.backgroundLight, //Fondo gris perla premium.
+      // ✅ 1. FONDO PANTALLA DINÁMICO
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, 
       
       //TopBar
       appBar: AppBar(
@@ -194,7 +195,9 @@ class _HistorialPageState extends State<HistorialPage> {
                 //--- NUEVO: FILTRO DE CONDUCTOR SOLO PARA ADMIN ---
                 if (_esAdmin) ...[
                   Container(
+                    // ✅ 2. FONDO TARJETA DINÁMICO
                     decoration: TaxiTheme.decoracionTarjeta.copyWith(
+                      color: Theme.of(context).cardColor,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.05), //Sombra suave y profesional.
@@ -210,17 +213,19 @@ class _HistorialPageState extends State<HistorialPage> {
                         isExpanded: true,
                         hint: const Text('Todos los conductores', style: TextStyle(color: TaxiTheme.textSecondary)),
                         value: _conductorSeleccionado,
-                        icon: const Icon(Icons.person_search, color: TaxiTheme.primaryDark),
+                        icon: Icon(Icons.person_search, color: Theme.of(context).colorScheme.secondary),
                         items: [
                           //Añadimos la opción "Todos" al principio
-                          const DropdownMenuItem<String>(
+                          DropdownMenuItem<String>(
                             value: null,
-                            child: Text('Todos los conductores', style: TextStyle(fontWeight: FontWeight.bold, color: TaxiTheme.primaryDark)),
+                            // ✅ 3. COLOR DE TEXTO DINÁMICO
+                            child: Text('Todos los conductores', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color)),
                           ),
                           ..._listaConductores.map((c) {
                             return DropdownMenuItem<String>(
                               value: c['id_conductor'].toString(),
-                              child: Text("${c['nombre']} ${c['apellido'] ?? ''}", style: const TextStyle(fontWeight: FontWeight.bold, color: TaxiTheme.primaryDark)),
+                              // ✅ 3. COLOR DE TEXTO DINÁMICO
+                              child: Text("${c['nombre']} ${c['apellido'] ?? ''}", style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color)),
                             );
                           })
                         ],
@@ -237,7 +242,9 @@ class _HistorialPageState extends State<HistorialPage> {
 
                 //Caja con el selector de tiempo ampliado.
                 Container(
+                  // ✅ 2. FONDO TARJETA DINÁMICO
                   decoration: TaxiTheme.decoracionTarjeta.copyWith(
+                    color: Theme.of(context).cardColor,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.05), //Sombra suave y profesional.
@@ -251,14 +258,15 @@ class _HistorialPageState extends State<HistorialPage> {
                     child: DropdownButton<String>(
                       isExpanded: true, //Ocupa todo el ancho disponible.
                       value: _filtroFrecuencia, //El valor actual seleccionado.
-                      icon: const Icon(Icons.calendar_today, color: TaxiTheme.primaryDark, size: 20),
+                      icon: Icon(Icons.calendar_today, color: Theme.of(context).colorScheme.secondary, size: 20),
                       //Lista ampliada de opciones
                       items: ['Hoy', 'Esta Semana', 'Este Mes', 'Mes Anterior', 'Este Año', 'Todos'].map((String valor) {
                         return DropdownMenuItem<String>(
                           value: valor,
+                          // ✅ 3. COLOR DE TEXTO DINÁMICO
                           child: Text(
                             valor, 
-                            style: const TextStyle(fontWeight: FontWeight.bold, color: TaxiTheme.primaryDark)
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color)
                           ),
                         );
                       }).toList(),
@@ -331,7 +339,9 @@ class _HistorialPageState extends State<HistorialPage> {
 
                           //Dibujamos la tarjeta individual para cada registro.
                           return Container(
+                            // ✅ 2. FONDO TARJETA DINÁMICO
                             decoration: TaxiTheme.decoracionTarjeta.copyWith(
+                              color: Theme.of(context).cardColor,
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.05), //Sombra suave y profesional.
@@ -351,7 +361,7 @@ class _HistorialPageState extends State<HistorialPage> {
                                       color: TaxiTheme.primaryDark.withOpacity(0.1),
                                       shape: BoxShape.circle,
                                     ),
-                                    child: const Icon(Icons.access_time_filled, color: TaxiTheme.primaryDark),
+                                    child: Icon(Icons.access_time_filled, color: Theme.of(context).colorScheme.secondary),
                                   ),
                                   const SizedBox(width: 16),
                                   
@@ -362,10 +372,11 @@ class _HistorialPageState extends State<HistorialPage> {
                                       children: [
                                         Text(
                                           'Jornada del $fechaEspanola',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 15,
-                                            color: TaxiTheme.primaryDark,
+                                            // ✅ 3. COLOR DE TEXTO DINÁMICO
+                                            color: Theme.of(context).textTheme.bodyLarge?.color,
                                           ),
                                         ),
                                         const SizedBox(height: 4),

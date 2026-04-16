@@ -10,6 +10,8 @@ import 'pages/activo.dart';
 import 'pages/export.dart';
 import 'pages/historial.dart';
 import 'pages/estaciones.dart';
+import 'pages/ajustes.dart';
+import 'theme/app_theme.dart'; // Añadido para poder leer temaGlobal y TaxiTheme
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,29 +29,42 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'TaxiControl',
-      //Mantenemos '/' como login por consistencia
-      initialRoute: '/',
+    // Envolvemos la app para que escuche el cambio de modo
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: temaGlobal,
+      builder: (context, modoActual, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'TaxiControl',
+          
+          // Propiedades añadidas para gestionar el tema
+          theme: TaxiTheme.temaClaro,
+          darkTheme: TaxiTheme.temaOscuro,
+          themeMode: modoActual,
 
-      routes: {
-        //RUTA DE ACCESO
-        '/': (context) => const LoginPage(),
+          //Mantenemos '/' como login por consistencia
+          initialRoute: '/',
 
-        //MENÚ PRINCIPAL (GRID 3x4)
-        '/menu': (context) => const MenuPrincipal(),
+          routes: {
+            //RUTA DE ACCESO
+            '/': (context) => const LoginPage(),
 
-        //PÁGINAS OPERATIVAS 
-        '/fichaje': (context) => const Fichaje(),
-        '/activos': (context) => const Activo(), 
-        '/gestion-plantilla': (context) => const GestionPlantilla(), 
-        '/export': (context) => const Export(),
-        '/trafico': (context) => const TraficoPage(),
-        '/historial': (context) => const HistorialPage(), 
-        '/notas-coche': (context) => const NotasCoche(),
-        '/estaciones': (context) => const EstacionesPage()
-      },
+            //MENÚ PRINCIPAL (GRID 3x4)
+            '/menu': (context) => const MenuPrincipal(),
+
+            //PÁGINAS OPERATIVAS 
+            '/fichaje': (context) => const Fichaje(),
+            '/activos': (context) => const Activo(), 
+            '/gestion-plantilla': (context) => const GestionPlantilla(), 
+            '/export': (context) => const Export(),
+            '/trafico': (context) => const TraficoPage(),
+            '/historial': (context) => const HistorialPage(), 
+            '/notas-coche': (context) => const NotasCoche(),
+            '/estaciones': (context) => const EstacionesPage(),
+            '/ajustes': (context) => const AjustesPage()
+          },
+        );
+      }
     );
   }
 }

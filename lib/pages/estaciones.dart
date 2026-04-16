@@ -181,7 +181,8 @@ class _EstacionesPageState extends State<EstacionesPage> {
   Widget build(BuildContext context) {
     //Scaffold es el esqueleto de la pantalla.
     return Scaffold(
-      backgroundColor: TaxiTheme.backgroundLight,
+      // ✅ 1. FONDO DINÁMICO
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       
       //TopBar
       appBar: AppBar(
@@ -209,7 +210,8 @@ class _EstacionesPageState extends State<EstacionesPage> {
           ? const Center(child: CircularProgressIndicator(color: TaxiTheme.accentGold))
           //Si es falso y no tenemos posición, mostramos un error.
           : _posicionActual == null
-              ? const Center(child: Text("No se pudo obtener la ubicación", style: TextStyle(color: TaxiTheme.textSecondary)))
+              // ✅ 2. TEXTO DINÁMICO (Por si no hay ubicación, que el error se lea bien en modo oscuro)
+              ? Center(child: Text("No se pudo obtener la ubicación", style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)))
               //Si es falso y TENEMOS posición, usamos Stack para dibujar el mapa y poner botones encima.
               : Stack(
                   children: [

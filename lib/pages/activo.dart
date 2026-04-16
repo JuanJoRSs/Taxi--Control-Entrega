@@ -59,7 +59,8 @@ class _ActivoState extends State<Activo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: TaxiTheme.backgroundLight, // FONDO: Gris perla ejecutivo
+      // ✅ 1. FONDO DINÁMICO: Lee si es de día o de noche
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor, 
       appBar: AppBar(
         title: const Text(
           'ESTADO DE FLOTA', // Título más profesional
@@ -103,7 +104,10 @@ class _ActivoState extends State<Activo> {
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 16),
-                    decoration: TaxiTheme.decoracionTarjeta, // SOMBRA: Neumorfismo suave
+                    // ✅ 2. TARJETA DINÁMICA: Reutilizamos tu sombra pero el color de fondo lo decide el tema
+                    decoration: TaxiTheme.decoracionTarjeta.copyWith(
+                      color: Theme.of(context).cardColor,
+                    ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(15),
                       leading: Container(
@@ -119,9 +123,10 @@ class _ActivoState extends State<Activo> {
                       ),
                       title: Text(
                         nombre.toUpperCase(), 
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w800, 
-                          color: TaxiTheme.primaryDark,
+                          // ✅ 3. TEXTO DINÁMICO: El nombre cambia de color según el fondo
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
                           letterSpacing: 0.5
                         )
                       ),

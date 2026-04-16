@@ -105,7 +105,8 @@ class _FichajeState extends State<Fichaje> {
     final bool estaEnTurno = _idFichajeActivo != null;
 
     return Scaffold(
-      backgroundColor: TaxiTheme.backgroundLight, // TOKEN: Gris perla suave
+      // ✅ 1. FONDO DINÁMICO
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('REGISTRO DE JORNADA', style: TaxiTheme.tituloAppBar),
         centerTitle: true,
@@ -168,10 +169,11 @@ class _ContenidoFichaje extends StatelessWidget {
         const SizedBox(height: 40),
         Text(
           'Hola, $nombre',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 26,
             fontWeight: FontWeight.w800,
-            color: TaxiTheme.primaryDark,
+            // ✅ 2. TEXTO DINÁMICO: El saludo se vuelve blanco de noche y azul de día
+            color: Theme.of(context).textTheme.bodyLarge?.color,
             letterSpacing: 0.5,
           ),
         ),

@@ -67,8 +67,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //Definimos el color de fondo de la aplicación usando el token del tema.
-      backgroundColor: TaxiTheme.backgroundLight,
+      // ✅ 1. FONDO PANTALLA DINÁMICO
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('ACCESO AL SISTEMA', style: TaxiTheme.tituloAppBar),
         centerTitle: true, // Centramos el título
@@ -101,13 +101,14 @@ class _LoginPageState extends State<LoginPage> {
                   child: Image.asset('assets/images/logo.png'), 
                 ),
                 const SizedBox(height: 15), //Espaciador vertical
-                const Text(
+                Text(
                   'TAXI CONTROL',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 3,
-                    color: TaxiTheme.primaryDark,
+                    // ✅ 3. TEXTO DINÁMICO: El título principal cambia con el tema
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
                 
@@ -116,9 +117,9 @@ class _LoginPageState extends State<LoginPage> {
                 // Caja blanca que contiene los campos de entrada
                 Container(
                   padding: const EdgeInsets.all(25),
-                  // Usamos copyWith para asegurar que la sombra no sea negra sólida sino suave (withOpacity)
+                  // ✅ 2. FONDO TARJETA DINÁMICO
                   decoration: TaxiTheme.decoracionTarjeta.copyWith(
-                    color: TaxiTheme.surfaceWhite, // Forzamos el blanco puro para que resalte
+                    color: Theme.of(context).cardColor, 
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.08), // Sombra suave como en el menú
@@ -132,16 +133,17 @@ class _LoginPageState extends State<LoginPage> {
                       //Campo de texto para el correo electrónico
                       TextField(
                         controller: _userController,
-                        style: const TextStyle(color: TaxiTheme.textPrimary),
+                        // ✅ 3. TEXTO DINÁMICO: Color de lo que escribe el usuario
+                        style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
                         //Le dice al teclado que el siguiente paso es pasar al otro campo
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           labelText: 'Email del Conductor',
                           labelStyle: const TextStyle(color: TaxiTheme.textSecondary),
-                          prefixIcon: const Icon(Icons.email_outlined, color: TaxiTheme.primaryDark),
+                          prefixIcon: Icon(Icons.email_outlined, color: Theme.of(context).colorScheme.secondary),
                           filled: true,
-                          // Bajamos la opacidad del fondo del campo para que la tarjeta blanca mande
-                          fillColor: TaxiTheme.backgroundLight.withOpacity(0.3), 
+                          // ✅ FONDO INPUT DINÁMICO: Bajamos la opacidad del fondo de la pantalla
+                          fillColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.3), 
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide.none,
@@ -153,7 +155,8 @@ class _LoginPageState extends State<LoginPage> {
                       TextField(
                         controller: _passController,
                         obscureText: true, //Oculta los caracteres
-                        style: const TextStyle(color: TaxiTheme.textPrimary),
+                        // ✅ 3. TEXTO DINÁMICO
+                        style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
                         //Le dice al teclado que este es el último campo
                         textInputAction: TextInputAction.done,
                         //Detecta cuando se pulsa el botón de Enter y lanza la función de login
@@ -161,9 +164,10 @@ class _LoginPageState extends State<LoginPage> {
                         decoration: InputDecoration(
                           labelText: 'Contraseña',
                           labelStyle: const TextStyle(color: TaxiTheme.textSecondary),
-                          prefixIcon: const Icon(Icons.lock_person_outlined, color: TaxiTheme.primaryDark),
+                          prefixIcon: Icon(Icons.lock_person_outlined, color: Theme.of(context).colorScheme.secondary),
                           filled: true,
-                          fillColor: TaxiTheme.backgroundLight.withOpacity(0.3), 
+                          // ✅ FONDO INPUT DINÁMICO
+                          fillColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.3), 
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide.none,
