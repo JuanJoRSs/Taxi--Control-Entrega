@@ -12,19 +12,17 @@ class Agencias extends StatefulWidget {
 }
 
 class _AgenciasState extends State<Agencias> {
-  final _supabase = Supabase.instance.client;
+  final _supabase = Supabase.instance.client; // Conexión a la base de datos
   bool _estaCargando = true;
-  List<dynamic> _agencias = [];
-  String _busqueda = '';
-  DateTime? _fechaFiltro;
+  List<dynamic> _agencias = []; //Lista de estado para guardar las agencias que se muestran en la pantalla, recogiendo la información de la base de datos.
 
   @override
   void initState() {
     super.initState();
-    _cargarAgencias();
+    _cargarAgencias(); // Cargamos las agencias al iniciar la pantalla
   }
 
-  Future<void> _cargarAgencias() async {
+  Future<void> _cargarAgencias() async { //Funcion que consulta la tabla de agencias, ordenando por fecha, y si coincide, por hora
     setState(() => _estaCargando = true);
     try {
       final data = await _supabase
@@ -33,7 +31,7 @@ class _AgenciasState extends State<Agencias> {
           .order('fecha', ascending: true)
           .order('hora', ascending: true);
 
-      setState(() => _agencias = data);
+      setState(() => _agencias = data); //Metemos dentro de _agencias la información traída de la BBDD
     } catch (e) {
       _mostrarMensaje('Error al cargar agencias: $e', isError: true);
     } finally {
@@ -41,10 +39,10 @@ class _AgenciasState extends State<Agencias> {
     }
   }
 
-  Future<void> _eliminarAgencia(dynamic agencia) async {
+  Future<void> _eliminarAgencia(dynamic agencia) async { //Función de eliminar agencia con modal de confirmación
     final confirmar = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (_) => AlertDialog( //**Alert dialog es el modal**
         backgroundColor: TaxiTheme.backgroundLight,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Eliminar servicio', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -54,7 +52,7 @@ class _AgenciasState extends State<Agencias> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(context, false), //Al pulsar en eliminar se eliminar y el pop lleva a la pantalla anterior al modal (agencias propiamente dicho) 
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
@@ -66,7 +64,7 @@ class _AgenciasState extends State<Agencias> {
       ),
     );
 
-    if (confirmar != true) return;
+    if (confirmar != true) return; //Si el usuario no confirma la eliminación, se sale de la función sin hacer nada
 
     try {
       await _supabase.from('agencias').delete().eq('id', agencia['id']);
@@ -77,7 +75,7 @@ class _AgenciasState extends State<Agencias> {
     }
   }
 
-  void _mostrarMensaje(String texto, {bool isError = false}) {
+  void _mostrarMensaje(String texto, {bool isError = false}) { // Función para mostrar mensajes de éxito o error al usuario, dependiendo de la acción. El texto se pasa por parámetro, y el color se decide con el booleano isError
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(texto),
@@ -86,36 +84,7 @@ class _AgenciasState extends State<Agencias> {
     );
   }
 
-  Future<void> _seleccionarFechaFiltro(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _fechaFiltro ?? DateTime.now(),
-      firstDate: DateTime(2024),
-      lastDate: DateTime(2030),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(primary: TaxiTheme.primaryDark),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null) setState(() => _fechaFiltro = picked);
-  }
-
-  List<dynamic> get _agenciasFiltradas {
-    return _agencias.where((a) {
-      final matchBusqueda = _busqueda.isEmpty ||
-          (a['empresa'] ?? '').toLowerCase().contains(_busqueda.toLowerCase()) ||
-          (a['lugar_recogida'] ?? '').toLowerCase().contains(_busqueda.toLowerCase());
-      final matchFecha = _fechaFiltro == null ||
-          a['fecha'] == DateFormat('yyyy-MM-dd').format(_fechaFiltro!);
-      return matchBusqueda && matchFecha;
-    }).toList();
-  }
-
-  void _abrirFormulario({dynamic agencia}) async {
+  void _abrirFormulario({dynamic agencia}) async { //Función que redirige a la pantalla de formulario, y si se le pasa una agencia por parámetro, el formulario se abre en modo edición con los datos de esa agencia. Si no se le pasa nada, se abre en modo creación.
     final resultado = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
@@ -127,7 +96,7 @@ class _AgenciasState extends State<Agencias> {
 
   @override
   Widget build(BuildContext context) {
-    final agencias = _agenciasFiltradas;
+    final agencias = _agencias;
 
     return Scaffold(
       backgroundColor: TaxiTheme.backgroundLight,
@@ -153,72 +122,6 @@ class _AgenciasState extends State<Agencias> {
       ),
       body: Column(
         children: [
-          // Filtros
-          Container(
-            color: TaxiTheme.primaryDark,
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    onChanged: (v) => setState(() => _busqueda = v),
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: 'Buscar empresa o lugar...',
-                      hintStyle: const TextStyle(color: Colors.white54),
-                      prefixIcon: const Icon(Icons.search, color: Colors.white54),
-                      filled: true,
-                      fillColor: Colors.white12,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () => _seleccionarFechaFiltro(context),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: _fechaFiltro != null ? TaxiTheme.accentGold : Colors.white12,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_today,
-                          size: 16,
-                          color: _fechaFiltro != null ? TaxiTheme.primaryDark : Colors.white70,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          _fechaFiltro != null
-                              ? DateFormat('dd/MM').format(_fechaFiltro!)
-                              : 'Fecha',
-                          style: TextStyle(
-                            color: _fechaFiltro != null ? TaxiTheme.primaryDark : Colors.white70,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        if (_fechaFiltro != null) ...[
-                          const SizedBox(width: 4),
-                          GestureDetector(
-                            onTap: () => setState(() => _fechaFiltro = null),
-                            child: Icon(Icons.close, size: 14, color: TaxiTheme.primaryDark),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
           // Contador
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 4),
@@ -375,7 +278,7 @@ class _AgenciasState extends State<Agencias> {
                   ),
                 ],
               ),
-              if (a['notas'] != null && (a['notas'] as String).isNotEmpty) ...[
+              if (a['notes'] != null && (a['notes'] as String).isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -435,9 +338,7 @@ class _AgenciasState extends State<Agencias> {
   }
 }
 
-// ─────────────────────────────────────────
-// FORMULARIO (CREAR / EDITAR)
-// ─────────────────────────────────────────
+//FORMULUARIO DE CREAR Y EDITAR AGENCIA
 class _AgenciaForm extends StatefulWidget {
   final dynamic agencia;
   const _AgenciaForm({this.agencia});

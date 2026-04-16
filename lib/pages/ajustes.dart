@@ -116,7 +116,7 @@ class _AjustesPageState extends State<AjustesPage> {
                   trailing: const Icon(Icons.chevron_right, color: TaxiTheme.textSecondary),
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Función en desarrollo'), backgroundColor: TaxiTheme.primaryDark)
+                      const SnackBar(content: Text('Función en desarrollo'), backgroundColor: TaxiTheme.primaryDark, behavior: SnackBarBehavior.floating,)
                     );
                   },
                 ),

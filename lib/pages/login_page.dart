@@ -60,7 +60,6 @@ class _LoginPageState extends State<LoginPage> {
       // Enviamos el correo. Supabase usará automáticamente tu SMTP de Resend configurado.
       await supabase.auth.resetPasswordForEmail(
         email,
-        // IMPORTANTE: Este redirectTo debe coincidir con tu AndroidManifest y Supabase Dashboard
         redirectTo: 'io.supabase.flutter://reset-callback/', 
       );
 
