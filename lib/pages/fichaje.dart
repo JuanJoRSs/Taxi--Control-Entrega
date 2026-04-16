@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../theme/app_theme.dart'; // <--- Importamos los tokens premium
+import '../theme/app_theme.dart'; 
 
 class Fichaje extends StatefulWidget {
   const Fichaje({super.key});
@@ -12,27 +12,27 @@ class Fichaje extends StatefulWidget {
 class _FichajeState extends State<Fichaje> {
   final _supabase = Supabase.instance.client;
 
-  int? _idConductor;
+//Declaramos las varibles para almacenar id, nombre y estado del conductor
+  int? _idConductor; 
   int? _idFichajeActivo;
   String? _nombreConductor;
   bool _estaCargando = true;
 
   @override
-  void initState() {
+  void initState() { //Iniciamos el estado invocando la función para saber si pintamos el botón de entrada o salida
     super.initState();
     _checkEstado();
   }
 
-  // Comprobar si el conductor tiene una sesión abierta en la base de datos
-  Future<void> _checkEstado() async {
-    final user = _supabase.auth.currentUser;
+  Future<void> _checkEstado() async { //Método para verificar el estado del conductor y su fichaje activo
+    final user = _supabase.auth.currentUser; //Comprobamos si el usuario está autenticado, si no lo redirigimos al login
     if (user == null) {
       if (mounted) Navigator.of(context).pushReplacementNamed('/');
       return;
     }
 
     try {
-      final conductor = await _supabase
+      final conductor = await _supabase //Query para obtener el id y nombre del conductor a partir del auth_id del usuario autenticado
           .from('conductores')
           .select('id_conductor, nombre')
           .eq('auth_id', user.id)
@@ -40,17 +40,17 @@ class _FichajeState extends State<Fichaje> {
 
       if (conductor == null) throw 'Perfil no encontrado';
 
-      _idConductor = conductor['id_conductor'];
+      _idConductor = conductor['id_conductor']; //Si pasa el check, almacenamos el id y nombre del conductor en las variables de estado
       _nombreConductor = conductor['nombre'];
 
-      final fichaje = await _supabase
+      final fichaje = await _supabase //Query en busca para un fichaje con hora de entrada pero sin salida, dando la lógica de que hay que pintar el botón de salida si se encuentra uno, o el de entrada si no se encuentra ninguno
           .from('fichajes')
           .select('id')
           .eq('id_conductor', _idConductor!)
           .isFilter('hora_salida', null)
           .maybeSingle();
 
-      if (mounted) {
+      if (mounted) { //Si el widget sigue montado, actualizamos el estado con el id del fichaje activo y desactivamos la carga
         setState(() {
           _idFichajeActivo = fichaje?['id'];
           _estaCargando = false;
@@ -61,15 +61,14 @@ class _FichajeState extends State<Fichaje> {
     }
   }
 
-  // Registrar entrada o salida
-  Future<void> _gestionarFichaje() async {
+  Future<void> _gestionarFichaje() async { //Método para entrar/salir dependiendo del estado que se encuentre antes de pulsar
     if (_idConductor == null) return;
 
     setState(() => _estaCargando = true);
     final esEntrada = _idFichajeActivo == null;
 
-    try {
-      if (esEntrada) {
+    try { 
+      if (esEntrada) { //Si es una entrada, insertamos un registro con la hora de entrada, uniendolo con el id y dejando en null la hora de salida
         final response = await _supabase
             .from('fichajes')
             .insert({'id_conductor': _idConductor})
@@ -78,12 +77,12 @@ class _FichajeState extends State<Fichaje> {
 
         setState(() => _idFichajeActivo = response['id']);
       } else {
-        await _supabase
+        await _supabase //Si es una salida updateamos la tabla modificando el registro con la hora de salida actual
             .from('fichajes')
             .update({'hora_salida': DateTime.now().toUtc().toIso8601String()})
             .eq('id', _idFichajeActivo!);
 
-        setState(() => _idFichajeActivo = null);
+        setState(() => _idFichajeActivo = null); //Y limpiamos el id del fichaje activo para volver a pintar el botón de entrada
       }
     } catch (e) {
       _manejarError('No se pudo registrar: $e');
@@ -92,7 +91,7 @@ class _FichajeState extends State<Fichaje> {
     }
   }
 
-  void _manejarError(String mensaje) {
+  void _manejarError(String mensaje) { //Método auxiliar para los errores
     if (!mounted) return;
     setState(() => _estaCargando = false);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -101,21 +100,21 @@ class _FichajeState extends State<Fichaje> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final bool estaEnTurno = _idFichajeActivo != null;
+  Widget build(BuildContext context) { //Widget que pinta la interfaz según el estado que reciba de la función _checkEstado
+    final bool estaEnTurno = _idFichajeActivo != null; //Variable estaEnTurno para no manejar la lógica de si es entrada o salida en el widget, sino solo pintar según el estado que reciba
 
     return Scaffold(
-      backgroundColor: TaxiTheme.backgroundLight, // TOKEN: Gris perla suave
+      backgroundColor: TaxiTheme.backgroundLight,
       appBar: AppBar(
         title: const Text('REGISTRO DE JORNADA', style: TaxiTheme.tituloAppBar),
         centerTitle: true,
-        backgroundColor: TaxiTheme.primaryDark, // TOKEN: Azul Noche
+        backgroundColor: TaxiTheme.primaryDark, 
         elevation: 0,
         iconTheme: const IconThemeData(color: TaxiTheme.surfaceWhite),
       ),
       body: Center(
         child: _estaCargando
-            ? const CircularProgressIndicator(color: TaxiTheme.accentGold) // Carga en Dorado
+            ? const CircularProgressIndicator(color: TaxiTheme.accentGold)
             : _ContenidoFichaje(
                 nombre: _nombreConductor ?? 'Conductor',
                 estaEnTurno: estaEnTurno,
@@ -126,7 +125,7 @@ class _FichajeState extends State<Fichaje> {
   }
 }
 
-class _ContenidoFichaje extends StatelessWidget {
+class _ContenidoFichaje extends StatelessWidget { //
   final String nombre;
   final bool estaEnTurno;
   final VoidCallback onTap;
@@ -138,7 +137,7 @@ class _ContenidoFichaje extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { //Widget que pinta el contenido del fichaje, con un indicador visual del estado, el nombre del conductor, una etiqueta de estado y un botón de acción principal que cambia según el estado
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -228,10 +227,6 @@ class _ContenidoFichaje extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-        const Text(
-          'El registro quedará guardado con su ubicación actual',
-          style: TextStyle(color: TaxiTheme.textSecondary, fontSize: 11),
-        )
       ],
     );
   }

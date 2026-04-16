@@ -226,12 +226,12 @@ class _AgendaContactosState extends State<AgendaContactos> {
             backgroundColor: TaxiTheme.success, 
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
           ),
-          onPressed: _cargando ? null : _guardarContacto,
+          onPressed: _cargando ? null : _guardarContacto, //Si está cargando, el botón se desactiva para evitar múltiples pulsaciones, si no, se activa y llama a la función de guardar contacto
           icon: _cargando 
             ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
             : const Icon(Icons.save, color: Colors.white),
           label: Text(
-            _cargando ? "PROCESANDO..." : "GUARDAR EN AGENDA", 
+            _cargando ? "PROCESANDO..." : "GUARDAR EN AGENDA", //El texto del botón cambia si esta cargando o no, para dar accesibilidad al usuario
             style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 16)
           ),
         ),
