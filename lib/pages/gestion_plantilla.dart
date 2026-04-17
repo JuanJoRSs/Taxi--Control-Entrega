@@ -46,10 +46,10 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        // ✅ FONDO DINÁMICO: El diálogo cambia según el tema
+        //  El diálogo cambia según el tema
         backgroundColor: Theme.of(context).scaffoldBackgroundColor, 
         title: const Text('¿ELIMINAR CONDUCTOR?', style: TextStyle(color: TaxiTheme.primaryDark, fontWeight: FontWeight.bold)),
-        // ✅ TEXTO DINÁMICO: Para que se lea bien en oscuro
+        //  Para que se lea bien en oscuro
         content: Text(
           'Vas a eliminar a ${conductor['nombre']} ${conductor['apellido'] ?? ''}.\n\nSe borrarán sus datos y su cuenta de acceso de forma permanente.', 
           style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)
@@ -110,7 +110,7 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        // ✅ FONDO DINÁMICO: El diálogo de alta cambia según el tema
+        //  El diálogo de alta cambia según el tema
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TaxiTheme.radioTarjeta)),
         title: const Text('NUEVO CONDUCTOR', style: TextStyle(color: TaxiTheme.primaryDark, fontWeight: FontWeight.bold, fontSize: 18)),
@@ -154,15 +154,15 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
       obscureText: oscuro,
       keyboardType: tipo,
       textInputAction: accion,
-      // ✅ COLOR TEXTO INPUT: Para que no se escriba en negro sobre fondo oscuro
+      //  Para que no se escriba en negro sobre fondo oscuro
       style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: TaxiTheme.textSecondary),
-        // ✅ ICONO INPUT: Se vuelve dorado en oscuro o azul en claro
+        //  Se vuelve dorado en oscuro o azul en claro
         prefixIcon: Icon(icono, color: Theme.of(context).colorScheme.secondary, size: 20),
         filled: true,
-        // ✅ FONDO INPUT: Dinámico
+        //  Dinámico
         fillColor: Theme.of(context).cardColor,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(TaxiTheme.radioTarjeta), borderSide: BorderSide.none),
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -216,7 +216,7 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // ✅ 1. FONDO PANTALLA DINÁMICO
+      //  FONDO PANTALLA DINÁMICO
       backgroundColor: Theme.of(context).scaffoldBackgroundColor, 
       appBar: AppBar(
         title: const Text('GESTIÓN DE PLANTILLA', style: TaxiTheme.tituloAppBar),
@@ -242,7 +242,7 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
                   itemBuilder: (context, index) {
                     final c = _conductores[index];
                     return Container(
-                      // ✅ 2. FONDO TARJETA DINÁMICO
+                      //  FONDO TARJETA DINÁMICO
                       decoration: TaxiTheme.decoracionTarjeta.copyWith(
                         color: Theme.of(context).cardColor,
                         boxShadow: [
@@ -256,10 +256,10 @@ class _GestionPlantillaState extends State<GestionPlantilla> {
                       child: ListTile(
                         leading: CircleAvatar(
                           backgroundColor: TaxiTheme.primaryDark.withOpacity(0.1),
-                          // ✅ ICONO AVATAR: Se adapta al tema
+                          // ICONO AVATAR: Se adapta al tema
                           child: Icon(Icons.person, color: Theme.of(context).colorScheme.secondary),
                         ),
-                        // ✅ 3. COLOR DE TEXTO DINÁMICO
+                        //  COLOR DE TEXTO DINÁMICO
                         title: Text('${c['nombre']} ${c['apellido'] ?? ''}', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color)),
                         subtitle: Text(c['email'] ?? 'Sin email', style: const TextStyle(color: TaxiTheme.textSecondary)),
                         trailing: IconButton(

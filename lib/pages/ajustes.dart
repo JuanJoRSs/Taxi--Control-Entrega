@@ -67,7 +67,7 @@ class _AjustesPageState extends State<AjustesPage> {
         padding: const EdgeInsets.all(16.0),
         children: [
           
-          // --- SECCIÓN 1: PERFIL ---
+          // perfil
           const Padding(
             padding: EdgeInsets.only(left: 8, bottom: 8),
             child: Text('MI CUENTA', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 12)),
@@ -93,7 +93,7 @@ class _AjustesPageState extends State<AjustesPage> {
           ),
           const SizedBox(height: 24),
 
-          // --- SECCIÓN 2: PREFERENCIAS ---
+          // Preferencias
           const Padding(
             padding: EdgeInsets.only(left: 8, bottom: 8),
             child: Text('PREFERENCIAS', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 12)),
@@ -133,7 +133,7 @@ class _AjustesPageState extends State<AjustesPage> {
           ),
           const SizedBox(height: 32),
 
-          // --- SECCIÓN 3: CERRAR SESIÓN ---
+          // Cerrar sesion 
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor, 

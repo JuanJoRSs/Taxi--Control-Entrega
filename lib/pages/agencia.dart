@@ -43,7 +43,7 @@ class _AgenciasState extends State<Agencias> {
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog( //**Alert dialog es el modal**
-        // ✅ FONDO DINÁMICO: Se adapta al modo claro/oscuro
+        //  Se adapta al modo claro/oscuro
         backgroundColor: Theme.of(context).dialogBackgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Eliminar servicio', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -80,7 +80,7 @@ class _AgenciasState extends State<Agencias> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(texto),
-        // ✅ FONDO DINÁMICO: Se adapta al modo claro/oscuro
+        //  Se adapta al modo claro/oscuro
         backgroundColor: isError ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary,
       ),
     );
@@ -101,7 +101,7 @@ class _AgenciasState extends State<Agencias> {
     final agencias = _agencias;
 
     return Scaffold(
-      // ✅ FONDO DINÁMICO: Se adapta al modo claro/oscuro
+      //  Se adapta al modo claro/oscuro
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('GESTIÓN DE AGENCIAS', style: TaxiTheme.tituloAppBar),
@@ -173,7 +173,7 @@ class _AgenciasState extends State<Agencias> {
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 7),
-      // ✅ TARJETA DINÁMICA: Fondo se adapta al modo claro/oscuro
+      //  Fondo se adapta al modo claro/oscuro
       decoration: TaxiTheme.decoracionTarjeta.copyWith(
         color: Theme.of(context).cardColor,
         border: esHoy ? Border.all(color: TaxiTheme.accentGold, width: 2) : null,
@@ -217,7 +217,7 @@ class _AgenciasState extends State<Agencias> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w800,
-                                  // ✅ TEXTO DINÁMICO: Se adapta al modo claro/oscuro
+                                  //  Se adapta al modo claro/oscuro
                                   color: Theme.of(context).textTheme.bodyLarge?.color,
                                 ),
                               ),
@@ -234,7 +234,7 @@ class _AgenciasState extends State<Agencias> {
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w900,
-                                    // ✅ TEXTO DINÁMICO: Se adapta al modo claro/oscuro
+                                    //  Se adapta al modo claro/oscuro
                                     color: TaxiTheme.primaryDark, // Mantener branding
                                   ),
                                 ),
@@ -280,7 +280,7 @@ class _AgenciasState extends State<Agencias> {
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w900,
-                      // ✅ TEXTO DINÁMICO: Se adapta al modo claro/oscuro
+                      //  Se adapta al modo claro/oscuro
                       color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
@@ -313,7 +313,7 @@ class _AgenciasState extends State<Agencias> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        // ✅ FONDO DINÁMICO: Se adapta al modo claro/oscuro
+        //  Se adapta al modo claro/oscuro
         color: Theme.of(context).colorScheme.surface.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
       ),

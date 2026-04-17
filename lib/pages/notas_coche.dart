@@ -74,7 +74,7 @@ class _NotasCoche extends State<NotasCoche> {
       barrierDismissible: !_enviando,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          // ✅ FONDO DEL DIÁLOGO DINÁMICO
+          //  FONDO DEL DIÁLOGO DINÁMICO
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(TaxiTheme.radioTarjeta)),
           title: const Text('NUEVA ANOTACIÓN', style: TextStyle(color: TaxiTheme.primaryDark, fontWeight: FontWeight.bold)),
@@ -85,11 +85,11 @@ class _NotasCoche extends State<NotasCoche> {
                 value: cat,
                 decoration: InputDecoration(
                   filled: true,
-                  // ✅ FONDO DEL SELECTOR DINÁMICO
+                  //  FONDO DEL SELECTOR DINÁMICO
                   fillColor: Theme.of(context).cardColor,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                 ),
-                // ✅ TEXTO DEL SELECTOR DINÁMICO
+                //  TEXTO DEL SELECTOR DINÁMICO
                 items: opciones.map((e) => DropdownMenuItem(value: e, child: Text(e, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)))).toList(),
                 onChanged: (val) => setDialogState(() => cat = val!),
               ),
@@ -97,13 +97,13 @@ class _NotasCoche extends State<NotasCoche> {
               TextField(
                 controller: controller,
                 maxLines: 3,
-                // ✅ TEXTO DEL INPUT DINÁMICO
+                // TEXTO DEL INPUT DINÁMICO
                 style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
                 decoration: InputDecoration(
                   hintText: 'Escribe aquí...',
                   hintStyle: const TextStyle(color: TaxiTheme.textSecondary),
                   filled: true,
-                  // ✅ FONDO DEL INPUT DINÁMICO
+                  // FONDO DEL INPUT DINÁMICO
                   fillColor: Theme.of(context).cardColor,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
                 ),
@@ -131,7 +131,7 @@ class _NotasCoche extends State<NotasCoche> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // ✅ 1. FONDO PANTALLA DINÁMICO
+      //  FONDO PANTALLA DINÁMICO
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('ANOTACIONES DEL VEHICULO', style: TaxiTheme.tituloAppBar),
@@ -175,7 +175,7 @@ class _NotasCoche extends State<NotasCoche> {
                 ),
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 12),
-                  // ✅ 2. FONDO TARJETA DINÁMICO (manteniendo tu borde izquierdo)
+                  //  FONDO TARJETA DINÁMICO (manteniendo tu borde izquierdo)
                   decoration: TaxiTheme.decoracionTarjeta.copyWith(
                     color: Theme.of(context).cardColor,
                     border: Border(left: BorderSide(color: color, width: 6)),
@@ -194,7 +194,7 @@ class _NotasCoche extends State<NotasCoche> {
                     ),
                     subtitle: Padding(
                       padding: const EdgeInsets.only(top: 8),
-                      // ✅ 3. TEXTO DESCRIPCIÓN DINÁMICO
+                      //  TEXTO DESCRIPCIÓN DINÁMICO
                       child: Text(nota['descripcion'],
                         style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontSize: 15),
                       ),

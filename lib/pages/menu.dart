@@ -73,7 +73,7 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
   Widget build(BuildContext context) {
     //Scaffold es el esqueleto de la pantalla tiene barra superior, cuerpo, fondo.
     return Scaffold(
-      // ✅ 1. FONDO PANTALLA DINÁMICO
+      //  FONDO PANTALLA DINÁMICO
       backgroundColor: Theme.of(context).scaffoldBackgroundColor, 
       
       //TopBar
@@ -131,7 +131,7 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 2,
-                            // ✅ 3. TEXTO DINÁMICO: El logo cambia según el tema
+                            //  TEXTO DINÁMICO: El logo cambia según el tema
                             color: Theme.of(context).textTheme.bodyLarge?.color,
                           ),
                         ),
@@ -193,7 +193,7 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
   Widget _botonMenu(IconData icono, String texto, Color color, String ruta) {
     return Container(
       decoration: TaxiTheme.decoracionTarjeta.copyWith(
-        // ✅ 2. FONDO TARJETA DINÁMICO
+        //  FONDO TARJETA DINÁMICO
         color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
@@ -216,7 +216,7 @@ class _MenuPrincipalState extends State<MenuPrincipal> {
               Text(
                 texto,
                 textAlign: TextAlign.center,
-                // ✅ 3. TEXTO DINÁMICO: Combina tu estilo base con el color dinámico
+                //  TEXTO DINÁMICO: Combina tu estilo base con el color dinámico
                 style: TaxiTheme.textoBotonGrid.copyWith(
                   color: Theme.of(context).textTheme.bodyLarge?.color,
                 ),
