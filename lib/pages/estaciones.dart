@@ -153,7 +153,8 @@ class _EstacionesPageState extends State<EstacionesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: TaxiTheme.backgroundLight,
+      // ✅ 1. FONDO DINÁMICO
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('ESTACIONES DE SERVICIO', style: TaxiTheme.tituloAppBar),
         centerTitle: true, //Centramos el título.
@@ -174,10 +175,12 @@ class _EstacionesPageState extends State<EstacionesPage> {
 
       body: _cargando //Consultamos si la variable de carga es verdadera o falsa para mostrar el círculo de carga, el error o el mapa.
           ? const Center(child: CircularProgressIndicator(color: TaxiTheme.accentGold))
-          : _posicionActual == null //Si es falso y no tenemos posición, mostramos un error.
-              ? const Center(child: Text("No se pudo obtener la ubicación", style: TextStyle(color: TaxiTheme.textSecondary)))
-
-              : Stack( //Si es falso y TENEMOS posición, usamos Stack para dibujar el mapa y poner botones encima.
+          //Si es falso y no tenemos posición, mostramos un error.
+          : _posicionActual == null
+              // ✅ 2. TEXTO DINÁMICO (Por si no hay ubicación, que el error se lea bien en modo oscuro)
+              ? Center(child: Text("No se pudo obtener la ubicación", style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)))
+              //Si es falso y TENEMOS posición, usamos Stack para dibujar el mapa y poner botones encima.
+              : Stack(
                   children: [
                     GoogleMap(
                       onMapCreated: (controller) => _mapController = controller, //Capa de fondo: El mapa de Google.

@@ -16,9 +16,7 @@ import 'pages/agenda.dart';
 import 'pages/ajustes.dart';
 import 'pages/agencia.dart';
 // IMPORTANTE: Añadimos la importación de la pantalla de cambio de contraseña
-import 'pages/cambio_password.dart'; 
-
-final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+import 'pages/cambio_password.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,45 +38,32 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Envolvemos la app para que escuche el cambio de modo
     return ValueListenableBuilder<ThemeMode>(
-      valueListenable: themeNotifier,
-      builder: (_, currentMode, __) {
+      valueListenable: temaGlobal,
+      builder: (context, modoActual, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'TaxiControl',
           
-          themeMode: currentMode,
+          // Propiedades añadidas para gestionar el tema
+          theme: TaxiTheme.temaClaro,
+          darkTheme: TaxiTheme.temaOscuro,
+          themeMode: modoActual,
 
-          // TEMA CLARO
-          theme: ThemeData.light().copyWith(
-            scaffoldBackgroundColor: TaxiTheme.backgroundLight,
-            appBarTheme: const AppBarTheme(
-              backgroundColor: TaxiTheme.primaryDark,
-              elevation: 0,
-              iconTheme: IconThemeData(color: Colors.white),
-              titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
-
-          // TEMA OSCURO
-          darkTheme: ThemeData.dark().copyWith(
-            scaffoldBackgroundColor: const Color(0xFF121212),
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Color(0xFF1E1E1E),
-              elevation: 0,
-              iconTheme: IconThemeData(color: TaxiTheme.accentGold),
-              titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
-
+          //Mantenemos '/' como login por consistencia
           initialRoute: '/',
 
           routes: {
+            //RUTA DE ACCESO
             '/': (context) => const LoginPage(),
             '/login': (context) => const LoginPage(),
             // NUEVA RUTA: Para que el sistema sepa a dónde ir al recuperar contraseña
             '/cambio-password': (context) => const PantallaCambioPassword(),
+            //MENÚ PRINCIPAL (GRID 3x4)
             '/menu': (context) => const MenuPrincipal(),
+
+            //PÁGINAS OPERATIVAS
             '/fichaje': (context) => const Fichaje(),
             '/activos': (context) => const Activo(), 
             '/gestion-plantilla': (context) => const GestionPlantilla(), 
@@ -93,7 +78,7 @@ class MyApp extends StatelessWidget {
             '/agencias': (context) => const Agencias()
           },
         );
-      },
+      }
     );
   }
 }

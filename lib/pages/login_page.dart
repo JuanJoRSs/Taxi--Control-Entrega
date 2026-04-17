@@ -131,7 +131,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: TaxiTheme.backgroundLight,
+      // ✅ 1. FONDO PANTALLA DINÁMICO
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('ACCESO AL SISTEMA', style: TaxiTheme.tituloAppBar),
         centerTitle: true,
@@ -161,14 +162,15 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: Image.asset('assets/images/logo.png'), 
                 ),
-                const SizedBox(height: 15),
-                const Text(
+                const SizedBox(height: 15), //Espaciador vertical
+                Text(
                   'TAXI CONTROL',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 3,
-                    color: TaxiTheme.primaryDark,
+                    // ✅ 3. TEXTO DINÁMICO: El título principal cambia con el tema
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
                   ),
                 ),
                 
@@ -177,8 +179,9 @@ class _LoginPageState extends State<LoginPage> {
                 // Tarjeta de Login
                 Container(
                   padding: const EdgeInsets.all(25),
+                  // ✅ 2. FONDO TARJETA DINÁMICO
                   decoration: TaxiTheme.decoracionTarjeta.copyWith(
-                    color: TaxiTheme.surfaceWhite, 
+                    color: Theme.of(context).cardColor,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.08), 
@@ -191,14 +194,16 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       TextField(
                         controller: _userController,
-                        style: const TextStyle(color: TaxiTheme.textPrimary),
+                        // ✅ 3. TEXTO DINÁMICO: Color de lo que escribe el usuario
+                        style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           labelText: 'Email del Conductor',
                           labelStyle: const TextStyle(color: TaxiTheme.textSecondary),
-                          prefixIcon: const Icon(Icons.email_outlined, color: TaxiTheme.primaryDark),
+                          prefixIcon: Icon(Icons.email_outlined, color: Theme.of(context).colorScheme.secondary),
                           filled: true,
-                          fillColor: TaxiTheme.backgroundLight.withOpacity(0.3), 
+                          // ✅ FONDO INPUT DINÁMICO: Bajamos la opacidad del fondo de la pantalla
+                          fillColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.3),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide.none,
@@ -208,16 +213,18 @@ class _LoginPageState extends State<LoginPage> {
                       const SizedBox(height: 20),
                       TextField(
                         controller: _passController,
-                        obscureText: true,
-                        style: const TextStyle(color: TaxiTheme.textPrimary),
+                        obscureText: true, //Oculta los caracteres
+                        // ✅ 3. TEXTO DINÁMICO
+                        style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
                         textInputAction: TextInputAction.done,
                         onSubmitted: (value) => login(),
                         decoration: InputDecoration(
                           labelText: 'Contraseña',
                           labelStyle: const TextStyle(color: TaxiTheme.textSecondary),
-                          prefixIcon: const Icon(Icons.lock_person_outlined, color: TaxiTheme.primaryDark),
+                          prefixIcon: Icon(Icons.lock_person_outlined, color: Theme.of(context).colorScheme.secondary),
                           filled: true,
-                          fillColor: TaxiTheme.backgroundLight.withOpacity(0.3), 
+                          // ✅ FONDO INPUT DINÁMICO
+                          fillColor: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.3), 
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide.none,

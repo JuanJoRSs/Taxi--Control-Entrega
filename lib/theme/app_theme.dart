@@ -1,5 +1,6 @@
-
 import 'package:flutter/material.dart';
+
+final ValueNotifier<ThemeMode> temaGlobal = ValueNotifier(ThemeMode.light);
 
 class TaxiTheme {
   //Paleta
@@ -33,12 +34,47 @@ class TaxiTheme {
   static BoxDecoration decoracionTarjeta = BoxDecoration(
     color: surfaceWhite,
     borderRadius: BorderRadius.circular(radioTarjeta),
-    boxShadow: [
+    boxShadow: const [
       BoxShadow(
         color: Colors.black,
         blurRadius: 10,
-        offset: const Offset(0, 4),
+        offset: Offset(0, 4),
       ),
     ],
+  );
+
+  // --- TEMA CLARO (DÍA) ---
+  static final ThemeData temaClaro = ThemeData(
+    brightness: Brightness.light,
+    scaffoldBackgroundColor: backgroundLight,
+    primaryColor: primaryDark,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: primaryDark,
+      foregroundColor: Colors.white,
+      elevation: 0,
+    ),
+    colorScheme: const ColorScheme.light(
+      primary: primaryDark,
+      secondary: accentGold,
+    ),
+    cardColor: surfaceWhite,
+  );
+
+  // --- TEMA OSCURO (NOCHE) ---
+  static final ThemeData temaOscuro = ThemeData(
+    brightness: Brightness.dark,
+    scaffoldBackgroundColor: const Color(0xFF121212),
+    primaryColor: Colors.black,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.black,
+      foregroundColor: accentGold,
+      elevation: 0,
+    ),
+    colorScheme: const ColorScheme.dark(
+      primary: accentGold,
+      secondary: accentGold,
+      surface: Color(0xFF1E1E1E),
+    ),
+    cardColor: const Color(0xFF1E1E1E),
   );
 }
