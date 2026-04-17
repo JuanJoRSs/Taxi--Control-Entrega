@@ -293,7 +293,6 @@ class _ExportState extends State<Export> {
       letterSpacing: 1.1
     )
   );
->>>>>>> origin/version-darkmode
 
   Widget _botonFechaPro({required String label, required VoidCallback onTap}) {
     return InkWell(
@@ -302,15 +301,6 @@ class _ExportState extends State<Export> {
         height: 55,
         // ✅ 2. TARJETA DINÁMICA: Fondo de los botones de fecha dinámico
         decoration: TaxiTheme.decoracionTarjeta.copyWith(
-          color: Theme.of(context).cardColor,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
           color: Theme.of(context).cardColor,
           boxShadow: [
             BoxShadow(

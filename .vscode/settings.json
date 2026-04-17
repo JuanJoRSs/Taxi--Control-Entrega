@@ -23,5 +23,6 @@
     "http",
     "net"
   ],
-  "editor.formatOnSave": false
+  "editor.formatOnSave": false,
+  "java.configuration.updateBuildConfiguration": "interactive"
 }

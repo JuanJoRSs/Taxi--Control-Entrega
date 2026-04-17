@@ -123,7 +123,7 @@ class _TraficoPageState extends State<TraficoPage> {
               backgroundColor: TaxiTheme.primaryDark,
               elevation: 6,
               onPressed: _obtenerUbicacionActual, //Al pulsar ejecuta la lógica del GPS
-              child: const Icon(Icons.my_location, color: Colors.white), 
+              child: Icon(Icons.my_location, color: Theme.of(context).colorScheme.onPrimary), 
             ),
           ),
         ],

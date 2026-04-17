@@ -43,7 +43,7 @@ class _AgendaContactosState extends State<AgendaContactos> {
       final data = await _supabase.from('agenda').select().order('nombre');
       setState(() => _contactos = data);
     } catch (e) {
-      _notificar("Error al cargar agenda", TaxiTheme.error);
+      _notificar("Error al cargar agenda", Theme.of(context).colorScheme.error);
     } finally {
       if (mounted) setState(() => _cargando = false);
     }
@@ -52,13 +52,13 @@ class _AgendaContactosState extends State<AgendaContactos> {
   Future<void> _gestionarAccion(String numero) async { //Este método lleva acabo una acción según la variable le diga que es Ordenador o Movil
     if (_esOrdenador) { //Si es ordenador, copiamos el número al portapapeles en lugar de intentar llamar
       await Clipboard.setData(ClipboardData(text: numero));
-      _notificar("Número copiado al portapapeles", TaxiTheme.success);
+      _notificar("Número copiado al portapapeles", Theme.of(context).colorScheme.primary);
     } else { //Si no es ordenador, intentamos lanzar la aplicación de teléfono para llamar al número
       final Uri launchUri = Uri(scheme: 'tel', path: numero);
       if (await canLaunchUrl(launchUri)) {
         await launchUrl(launchUri);
       } else {
-        _notificar("No se puede realizar la llamada", TaxiTheme.error); //Si existe algún error se notifica al usuario
+        _notificar("No se puede realizar la llamada", Theme.of(context).colorScheme.error); //Si existe algún error se notifica al usuario
       }
     }
   }
@@ -77,10 +77,10 @@ class _AgendaContactosState extends State<AgendaContactos> {
       _telefonoController.clear();
       setState(() => _mostrandoFormulario = false); //Cierra automáticamente el formulario una vez se guarda el contacto
       await _obtenerContactos(); //Abtiene de nuevo la lista de contactos para mostrar el nuevo contacto añadido sin necesidad de recargar la pantalla
-      _notificar("Contacto guardado correctamente", TaxiTheme.success);
+      _notificar("Contacto guardado correctamente", Theme.of(context).colorScheme.primary);
     } catch (e) {
       // Si falla, mostramos el error exacto para debugear
-      _notificar("Error: ${e.toString()}", TaxiTheme.error); //Si sale todo bien se notifica en verde, si hay algún fallo sale en rojo
+      _notificar("Error: ${e.toString()}", Theme.of(context).colorScheme.error); //Si sale todo bien se notifica en verde, si hay algún fallo sale en rojo
     } finally {
       if (mounted) setState(() => _cargando = false);
     }
@@ -98,7 +98,8 @@ class _AgendaContactosState extends State<AgendaContactos> {
   @override
   Widget build(BuildContext context) { //Widget principal simple, depende de la variable _mostrandoFormulario para mostrar la lista de contactos o el formulario de añadir nuevo contacto, y un botón flotante para mostrar el formulario
     return Scaffold(
-      backgroundColor: TaxiTheme.backgroundLight,
+      // ✅ FONDO DINÁMICO: Se adapta al modo claro/oscuro
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('AGENDA DE CONTACTOS', style: TaxiTheme.tituloAppBar), //El título esta siemrpe pero el botón para cerrar el formulario solo aparece si el formulario está abierto, para que el usuario pueda cerrarlo sin necesidad de guardar un contacto
         backgroundColor: TaxiTheme.primaryDark,
@@ -136,7 +137,10 @@ class _AgendaContactosState extends State<AgendaContactos> {
 
         return Container( //Construimos el container que tiene la decoración de la tarjeta de contacto
           margin: const EdgeInsets.only(bottom: 12),
-          decoration: TaxiTheme.decoracionTarjeta,
+          // ✅ TARJETA DINÁMICA: Fondo se adapta al modo claro/oscuro
+          decoration: TaxiTheme.decoracionTarjeta.copyWith(
+            color: Theme.of(context).cardColor,
+          ),
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             leading: CircleAvatar( //Avatar para rellenar la presentación
@@ -149,7 +153,7 @@ class _AgendaContactosState extends State<AgendaContactos> {
             ),
             subtitle: Text(
               numFull, //Se imprime el numero de telefono parseado
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: TaxiTheme.success)
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)
             ),
             trailing: IconButton(
               icon: Icon(_esOrdenador ? Icons.copy_rounded : Icons.phone_forwarded), //Detectando si estás en ordenador da un icono de copiar al portapapeles, y si no, un icono de un movil
@@ -173,15 +177,15 @@ class _AgendaContactosState extends State<AgendaContactos> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("NUEVO CONTACTO", style: TextStyle(fontWeight: FontWeight.bold, color: TaxiTheme.primaryDark)),
+                  Text("NUEVO CONTACTO", style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color)),
                   const SizedBox(height: 20),
                   _buildTextField(_nombreController, "Nombre completo", Icons.badge), //TextFields de nombre y numero, con sus respectivos controladores para recoger lo que el usuario introduzca
                   const SizedBox(height: 20),
                   _buildTextField(_telefonoController, "Número de teléfono", Icons.phone, keyboard: TextInputType.phone),
                   const SizedBox(height: 10),
-                  const Text(
+                  Text(
                     "Se guardará en la agenda común de la flota.", //Subtitulo
-                    style: TextStyle(fontSize: 12, color: TaxiTheme.textSecondary, fontStyle: FontStyle.italic),
+                    style: TextStyle(fontSize: 12, color: Theme.of(context).textTheme.bodyMedium?.color, fontStyle: FontStyle.italic),
                   ),
                 ],
               ),
@@ -200,12 +204,13 @@ class _AgendaContactosState extends State<AgendaContactos> {
       style: const TextStyle(fontWeight: FontWeight.bold),
       decoration: InputDecoration(
         hintText: hint,
-        prefixIcon: Icon(icon, color: TaxiTheme.primaryDark),
+        prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.primary),
         filled: true,
-        fillColor: TaxiTheme.surfaceWhite,
+        // ✅ FONDO INPUT DINÁMICO
+        fillColor: Theme.of(context).inputDecorationTheme.fillColor ?? Theme.of(context).scaffoldBackgroundColor.withOpacity(0.1),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.withOpacity(0.1))),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: TaxiTheme.accentGold)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: TaxiTheme.accentGold)),
       ),
       validator: (v) => v!.isEmpty ? "Este campo no puede estar vacío" : null, //Validación para asegurarse de que el campo correspondiente no esté vacío
     );

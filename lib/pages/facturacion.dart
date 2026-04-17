@@ -163,14 +163,15 @@ class _FacturacionScreenState extends State<Facturacion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: TaxiTheme.backgroundLight,
+      // ✅ FONDO DINÁMICO: Se adapta al modo claro/oscuro
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(_mostrandoFormulario ? 'NUEVA ENTRADA' : 'FACTURACIÓN', style: TaxiTheme.tituloAppBar),
         backgroundColor: TaxiTheme.primaryDark,
         centerTitle: true,
         elevation: 0,
         leading: _mostrandoFormulario 
-          ? IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: () => setState(() => _mostrandoFormulario = false))
+          ? IconButton(icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onPrimary), onPressed: () => setState(() => _mostrandoFormulario = false))
           : null,
       ),
       body: _mostrandoFormulario ? _buildFormularioArea() : _buildPrincipalArea(),
@@ -180,7 +181,7 @@ class _FacturacionScreenState extends State<Facturacion> {
               backgroundColor: TaxiTheme.accentGold,
               onPressed: () => setState(() => _mostrandoFormulario = true),
               icon: const Icon(Icons.add, color: TaxiTheme.primaryDark),
-              label: const Text("AÑADIR", style: TextStyle(color: TaxiTheme.primaryDark, fontWeight: FontWeight.bold)),
+              label: Text("AÑADIR", style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontWeight: FontWeight.bold)),
             ),
     );
   }
@@ -217,18 +218,18 @@ class _FacturacionScreenState extends State<Facturacion> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("MONTO RECAUDADO", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: TaxiTheme.primaryDark, letterSpacing: 1.2)),
+                  Text("MONTO RECAUDADO", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color, letterSpacing: 1.2)),
                   const SizedBox(height: 15),
                   TextFormField(
                     controller: _montoController,
                     autofocus: true,
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color),
                     decoration: InputDecoration(
                       hintText: '0.00',
-                      prefixIcon: const Icon(Icons.euro, color: TaxiTheme.success, size: 30),
+                      prefixIcon: Icon(Icons.euro, color: TaxiTheme.success, size: 30),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Theme.of(context).cardColor,
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
                       contentPadding: const EdgeInsets.symmetric(vertical: 20),
                     ),
@@ -237,10 +238,10 @@ class _FacturacionScreenState extends State<Facturacion> {
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      const Icon(Icons.info_outline, size: 16, color: TaxiTheme.textSecondary),
+                      Icon(Icons.info_outline, size: 16, color: Theme.of(context).textTheme.bodyLarge?.color),
                       const SizedBox(width: 8),
                       Text("Fecha de registro: ${DateFormat('dd/MM/yyyy').format(DateTime.now())}", 
-                        style: const TextStyle(color: TaxiTheme.textSecondary)),
+                        style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color)),
                     ],
                   ),
                 ],
@@ -257,8 +258,8 @@ class _FacturacionScreenState extends State<Facturacion> {
     return Container(
       padding: EdgeInsets.only(left: 20, right: 20, bottom: MediaQuery.of(context).padding.bottom + 20, top: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))],
+        color: Theme.of(context).cardColor,
+        boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))],
         borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
       ),
       child: SizedBox(
@@ -267,14 +268,14 @@ class _FacturacionScreenState extends State<Facturacion> {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: TaxiTheme.success,
-            foregroundColor: Colors.white,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             elevation: 0,
           ),
           onPressed: _cargando ? null : _guardarFacturacion,
           child: _cargando 
-              ? const CircularProgressIndicator(color: Colors.white)
-              : const Text("CONFIRMAR Y GUARDAR", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1)),
+              ? CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary)
+              : Text("CONFIRMAR Y GUARDAR", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1, color: Theme.of(context).colorScheme.onPrimary)),
         ),
       ),
     );
@@ -286,17 +287,17 @@ class _FacturacionScreenState extends State<Facturacion> {
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        decoration: TaxiTheme.decoracionTarjeta,
+        decoration: TaxiTheme.decoracionTarjeta.copyWith(color: Theme.of(context).cardColor),
         child: Row(
           children: [
-            const Icon(Icons.calendar_month, color: TaxiTheme.primaryDark),
+            Icon(Icons.calendar_month, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 15),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("PERIODO SELECCIONADO", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey[500])),
+                Text("PERIODO SELECCIONADO", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyMedium?.color)),
                 Text("${DateFormat('dd MMM').format(_fechaInicio)} — ${DateFormat('dd MMM').format(_fechaFin)}", 
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Theme.of(context).textTheme.bodyLarge?.color)),
               ],
             ),
             const Spacer(),
@@ -310,17 +311,25 @@ class _FacturacionScreenState extends State<Facturacion> {
   Widget _buildSelectorConductor() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      decoration: TaxiTheme.decoracionTarjeta,
+      decoration: TaxiTheme.decoracionTarjeta.copyWith(color: Theme.of(context).cardColor),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           isExpanded: true,
+          dropdownColor: Theme.of(context).cardColor,
+          style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
           value: _conductorSeleccionado,
-          hint: const Text('Todos los conductores'),
+          hint: Text('Todos los conductores', style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color)),
           items: [
-            const DropdownMenuItem<String>(value: null, child: Text('Todos los conductores')),
+            DropdownMenuItem<String>(
+              value: null,
+              child: Text('Todos los conductores', style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color)),
+            ),
             ..._listaConductores.map((c) => DropdownMenuItem<String>(
               value: c['auth_id'].toString(),
-              child: Text("${c['nombre']} ${c['apellido'] ?? ''}"),
+              child: Text(
+                "${c['nombre']} ${c['apellido'] ?? ''}",
+                style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+              ),
             ))
           ],
           onChanged: (val) {
@@ -340,8 +349,8 @@ class _FacturacionScreenState extends State<Facturacion> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text('TOTAL RECAUDADO: ', style: TextStyle(color: Colors.white, fontSize: 14)),
-          Text('${_totalSumado.toStringAsFixed(2)}€', style: const TextStyle(color: TaxiTheme.accentGold, fontWeight: FontWeight.bold, fontSize: 18)),
+          Text('TOTAL RECAUDADO: ', style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontSize: 14)),
+          Text('${_totalSumado.toStringAsFixed(2)}€', style: TextStyle(color: TaxiTheme.accentGold, fontWeight: FontWeight.bold, fontSize: 18)),
         ],
       ),
     );
@@ -358,13 +367,13 @@ class _FacturacionScreenState extends State<Facturacion> {
         final reg = _registros[index];
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
-          decoration: TaxiTheme.decoracionTarjeta,
+          decoration: TaxiTheme.decoracionTarjeta.copyWith(color: Theme.of(context).cardColor),
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            leading: const Icon(Icons.receipt_long, color: TaxiTheme.success),
-            title: Text('${reg['monto']} €', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            subtitle: Text('${reg['autor_nombre']} • ${DateFormat('dd/MM/yy').format(DateTime.parse(reg['fecha']))}'),
-            trailing: const Icon(Icons.chevron_right, size: 18),
+            leading: Icon(Icons.receipt_long, color: TaxiTheme.success),
+            title: Text('${reg['monto']} €', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Theme.of(context).textTheme.bodyLarge?.color)),
+            subtitle: Text('${reg['autor_nombre']} • ${DateFormat('dd/MM/yy').format(DateTime.parse(reg['fecha']))}', style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color)),
+            trailing: Icon(Icons.chevron_right, size: 18, color: Theme.of(context).iconTheme.color),
           ),
         );
       },
